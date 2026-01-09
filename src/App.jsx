@@ -47,7 +47,7 @@ const projects = [
     title: "TFIM Quantum Dynamics Simulator",
     desc: "A 4-qubit transverse field Ising model simulator on quantum hardware tracking average magnetization, nearby spin correlation, and total Hamiltonian evolution to observe magnetic interactions and energy dynamics over time",
     href: "https://github.com/Alain-Abraham-hub/TFIM-Quantum-Dynamics-Simulation.git",
-    images: ["/circuit diagram.png"],
+    images: ["/circuit diagram.png", "/average magnetization.png", "/nearby spin correlation.png", "/total hailtonian energy.png"],
   },
 ];
 
