@@ -3,37 +3,37 @@ const projects = [
     title: "QAOA Max-Cut Solver",
     desc: "Implementing the QAOA algorithm to find the max-cut of a graph on IBM's quantum processor (ibm_fez)",
     href: "https://github.com/Alain-Abraham-hub/QAOA-MaxCut-QuantumHardware.git",
-    image: "https://alain-abraham-hub.github.io/project1.png",
+    image: "/project1.png",
   },
   {
     title: "QKernels4Molecules",
     desc: "Exploring quantum-inspired feature maps and graph kernels for molecular machine learning.",
     href: "https://github.com/Alain-Abraham-hub/QKernels4Molecules.git",
-    image: "https://alain-abraham-hub.github.io/project2.jpg",
+    image: "/project2.jpg",
   },
   {
     title: "CHSH-Game",
     desc: "A simulation of a simple game to demonstrate the advantages of quantum entanglement",
     href: "https://github.com/Alain-Abraham-hub/CHSH-game.git",
-    image: "https://alain-abraham-hub.github.io/project3.png",
+    image: "/project3.png",
   },
   {
     title: "Super dense coding",
     desc: "An alternative method to teleport information using quantum entanglement",
     href: "https://github.com/Alain-Abraham-hub/Quantum-super-dense-coding.git",
-    image: "https://alain-abraham-hub.github.io/project4.png",
+    image: "/project4.png",
   },
   {
     title: "Quantum teleportation",
     desc: "A method to teleport information leveraging quantum entanglement",
     href: "https://github.com/Alain-Abraham-hub/Quantum-Teleportation.git",
-    image: "https://alain-abraham-hub.github.io/project5.png",
+    image: "/project5.png",
   },
   {
     title: "Quantum gates and circuit visualizer",
     desc: "An application to visualize how gates affect the nature of qubits on a circuit",
     href: "https://github.com/Alain-Abraham-hub/Quantum-Gate-Visualiser.git",
-    image: "https://alain-abraham-hub.github.io/project6.jpg",
+    image: "/project6.jpg",
   },
   {
     title: "VQE Ground State Finder",
@@ -41,6 +41,12 @@ const projects = [
     href: "https://github.com/Kukyos/GroundStateFinder.git",
     image: undefined,
   },
+  {
+    title: "TFIM Quantum Dynamics Simulator",
+    desc: "A Simple 4 Qubit dynamics simulator of traverse field ising on a quantum computer to observe the magnetic interactions and how energy evolves over time",
+    href: "https://github.com/Alain-Abraham-hub/TFIM-Quantum-Dynamics-Simulation.git",
+    image: undefined,
+  }
 ];
 
 const techStack = [
@@ -107,7 +113,7 @@ export default function App() {
             </div>
             <div className="md:w-72 md:shrink-0">
               <img
-                src="https://alain-abraham-hub.github.io/profile.jpg"
+                src="/profile.jpg"
                 alt="Alain Abraham"
                 className="w-full rounded-lg border border-cyan-500/20 shadow-lg"
               />
