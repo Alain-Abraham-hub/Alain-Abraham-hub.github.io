@@ -1,52 +1,54 @@
+import { useState } from 'react';
+
 const projects = [
   {
     title: "QAOA Max-Cut Solver",
     desc: "Implementing the QAOA algorithm to find the max-cut of a graph on IBM's quantum processor (ibm_fez)",
     href: "https://github.com/Alain-Abraham-hub/QAOA-MaxCut-QuantumHardware.git",
-    image: "/project1.png",
+    images: ["/project1.png"],
   },
   {
     title: "QKernels4Molecules",
     desc: "Exploring quantum-inspired feature maps and graph kernels for molecular machine learning.",
     href: "https://github.com/Alain-Abraham-hub/QKernels4Molecules.git",
-    image: "/project2.jpg",
+    images: ["/project2.jpg"],
   },
   {
     title: "CHSH-Game",
     desc: "A simulation of a simple game to demonstrate the advantages of quantum entanglement",
     href: "https://github.com/Alain-Abraham-hub/CHSH-game.git",
-    image: "/project3.png",
+    images: ["/project3.png"],
   },
   {
     title: "Super dense coding",
     desc: "An alternative method to teleport information using quantum entanglement",
     href: "https://github.com/Alain-Abraham-hub/Quantum-super-dense-coding.git",
-    image: "/project4.png",
+    images: ["/project4.png"],
   },
   {
     title: "Quantum teleportation",
     desc: "A method to teleport information leveraging quantum entanglement",
     href: "https://github.com/Alain-Abraham-hub/Quantum-Teleportation.git",
-    image: "/project5.png",
+    images: ["/project5.png"],
   },
   {
     title: "Quantum gates and circuit visualizer",
     desc: "An application to visualize how gates affect the nature of qubits on a circuit",
     href: "https://github.com/Alain-Abraham-hub/Quantum-Gate-Visualiser.git",
-    image: "/project6.jpg",
+    images: ["/project6.jpg"],
   },
   {
     title: "VQE Ground State Finder",
     desc: "An advanced VQE algorithm to find the ground state of molecule with error mitigation using ZNE",
     href: "https://github.com/Kukyos/GroundStateFinder.git",
-    image: undefined,
+    images: [],
   },
   {
     title: "TFIM Quantum Dynamics Simulator",
-    desc: "A Simple 4 Qubit dynamics simulator of traverse field ising on a quantum computer to observe the magnetic interactions and how energy evolves over time",
+    desc: "A 4-qubit transverse field Ising model simulator on quantum hardware tracking average magnetization, nearby spin correlation, and total Hamiltonian evolution to observe magnetic interactions and energy dynamics over time",
     href: "https://github.com/Alain-Abraham-hub/TFIM-Quantum-Dynamics-Simulation.git",
-    image: undefined,
-  }
+    images: ["/circuit diagram.png"],
+  },
 ];
 
 const techStack = [
@@ -61,6 +63,78 @@ const techStack = [
   "CSS",
   "Git",
 ];
+
+function ProjectCard({ project }) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % project.images.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? project.images.length - 1 : prev - 1
+    );
+  };
+
+  return (
+    <article className="grid gap-6 md:grid-cols-3 md:items-center border border-cyan-500/10 rounded-xl p-5 hover:border-cyan-500/30 transition-colors">
+      <div className="md:col-span-2">
+        <h3 className="text-xl font-light text-gray-100 mb-2">{project.title}</h3>
+        <p className="text-gray-400 leading-relaxed mb-4">{project.desc}</p>
+        <a
+          href={project.href}
+          target="_blank"
+          rel="noreferrer"
+          className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors"
+        >
+          View on GitHub →
+        </a>
+      </div>
+      {project.images && project.images.length > 0 ? (
+        <div className="md:justify-self-end relative group">
+          <img
+            src={project.images[currentImageIndex]}
+            alt={`${project.title} - Image ${currentImageIndex + 1}`}
+            className="w-full md:w-56 rounded-lg border border-cyan-500/20 shadow-md object-cover"
+          />
+          {project.images.length > 1 && (
+            <>
+              <button
+                onClick={prevImage}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-slate-950/80 hover:bg-slate-900 text-cyan-400 rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="Previous image"
+              >
+                ←
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-slate-950/80 hover:bg-slate-900 text-cyan-400 rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="Next image"
+              >
+                →
+              </button>
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {project.images.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      idx === currentImageIndex
+                        ? 'bg-cyan-400'
+                        : 'bg-gray-600 hover:bg-gray-500'
+                    }`}
+                    aria-label={`Go to image ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      ) : null}
+    </article>
+  );
+}
 
 export default function App() {
   return (
@@ -125,29 +199,7 @@ export default function App() {
           <h2 className="text-2xl font-light text-gray-100 mb-8"><span className="text-cyan-400">/</span> featured work</h2>
           <div className="space-y-10">
             {projects.map((project) => (
-              <article key={project.title} className="grid gap-6 md:grid-cols-3 md:items-center border border-cyan-500/10 rounded-xl p-5 hover:border-cyan-500/30 transition-colors">
-                <div className="md:col-span-2">
-                  <h3 className="text-xl font-light text-gray-100 mb-2">{project.title}</h3>
-                  <p className="text-gray-400 leading-relaxed mb-4">{project.desc}</p>
-                  <a
-                    href={project.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors"
-                  >
-                    View on GitHub →
-                  </a>
-                </div>
-                {project.image ? (
-                  <div className="md:justify-self-end">
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full md:w-56 rounded-lg border border-cyan-500/20 shadow-md object-cover"
-                    />
-                  </div>
-                ) : null}
-              </article>
+              <ProjectCard key={project.title} project={project} />
             ))}
           </div>
         </section>
