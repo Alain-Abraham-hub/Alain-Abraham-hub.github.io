@@ -63,6 +63,12 @@ export default function App() {
 
   const projects = [
     {
+      title: "Implementing SQD Algorithm",
+      desc: "Implementing the SQD algorithm to find the ground state of a molecule.",
+      href: "https://github.com/Alain-Abraham-hub/SQD-Algorithm-Groundstatefinder.git",
+      images: ["QC1.png", "QC2.png", "QC3.png", "QC4.png", "Bitstring recovery.png", "bitstring_frequencies.png"]
+    },
+    {
       title: "TFIM Quantum Dynamics Simulator",
       desc: "A program to simulate how quantum dynamics are simualted on quantum computer and to observe the average magnetization, interaction and the evloution of hamiltonian energy over time",
       href: "https://github.com/Alain-Abraham-hub/TFIM-Quantum-Dynamics-Simulation.git",
@@ -105,12 +111,7 @@ export default function App() {
       href: "https://github.com/Alain-Abraham-hub/Quantum-Gate-Visualiser.git",
       images: ["/circuit visualiser 1.jpeg", "circuit visualiser 2"]
     },
-    {
-      title: "Implementing SQD Algorithm",
-      desc: "Implementing the SQD algorithm to find the ground state of a molecule.",
-      href: "https://github.com/Alain-Abraham-hub/SQD-Algorithm-Groundstatefinder.git",
-      images: ["QC1.png", "QC2.png", "QC3.png", "QC4.png", "Bitstring recovery.png", "bitstring_frequencies.png"]
-    }
+    
     
   ];
 
