@@ -105,6 +105,12 @@ export default function App() {
       href: "https://github.com/Alain-Abraham-hub/Quantum-Gate-Visualiser.git",
       images: ["/circuit visualiser 1.jpeg", "circuit visualiser 2"]
     },
+    {
+      title: "Implementing SQD Algorithm",
+      desc: "Implementing the SQD algorithm to find the ground state of a molecule.",
+      href: "https://github.com/Alain-Abraham-hub/SQD-Algorithm-Groundstatefinder.git",
+      images: ["QC1.png", "QC2.png", "QC3.png", "QC4.png", "Bitstring recovery.png", "bitstring_frequencies.png"]
+    }
     
   ];
 
