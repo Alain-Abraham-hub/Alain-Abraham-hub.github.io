@@ -8,6 +8,8 @@ export default function App() {
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedProjectIndex, setSelectedProjectIndex] = useState(null);
+  const [selectedCertIndex, setSelectedCertIndex] = useState(null);
+  const [previewType, setPreviewType] = useState(null);
 
   useEffect(() => {
     return () => {
@@ -28,38 +30,52 @@ export default function App() {
 
   const handleImageClick = (projectIdx) => {
     setSelectedProjectIndex(projectIdx);
+    setSelectedCertIndex(null);
+    setPreviewType('project');
+    setCurrentImageIndex(0);
+    setShowImagePreview(true);
+  };
+
+  const handleCertImageClick = (certIdx) => {
+    setSelectedCertIndex(certIdx);
+    setSelectedProjectIndex(null);
+    setPreviewType('certification');
     setCurrentImageIndex(0);
     setShowImagePreview(true);
   };
 
   const handlePrevImage = () => {
-    if (selectedProjectIndex === null) return;
-    const imgs = (projects[selectedProjectIndex].images && projects[selectedProjectIndex].images.length)
-      ? projects[selectedProjectIndex].images
-      : (projects[selectedProjectIndex].image ? [projects[selectedProjectIndex].image] : []);
-    if (!imgs.length) return;
-    setCurrentImageIndex((prev) => (prev === 0 ? imgs.length - 1 : prev - 1));
+    if (previewType === 'project' && selectedProjectIndex !== null) {
+      const imgs = (projects[selectedProjectIndex].images && projects[selectedProjectIndex].images.length)
+        ? projects[selectedProjectIndex].images
+        : (projects[selectedProjectIndex].image ? [projects[selectedProjectIndex].image] : []);
+      if (!imgs.length) return;
+      setCurrentImageIndex((prev) => (prev === 0 ? imgs.length - 1 : prev - 1));
+    } else if (previewType === 'certification' && selectedCertIndex !== null) {
+      const imgs = (certifications[selectedCertIndex].images && certifications[selectedCertIndex].images.length)
+        ? certifications[selectedCertIndex].images
+        : (certifications[selectedCertIndex].image ? [certifications[selectedCertIndex].image] : []);
+      if (!imgs.length) return;
+      setCurrentImageIndex((prev) => (prev === 0 ? imgs.length - 1 : prev - 1));
+    }
   };
 
   const handleNextImage = () => {
-    if (selectedProjectIndex === null) return;
-    const imgs = (projects[selectedProjectIndex].images && projects[selectedProjectIndex].images.length)
-      ? projects[selectedProjectIndex].images
-      : (projects[selectedProjectIndex].image ? [projects[selectedProjectIndex].image] : []);
-    if (!imgs.length) return;
-    setCurrentImageIndex((prev) => (prev === imgs.length - 1 ? 0 : prev + 1));
+    if (previewType === 'project' && selectedProjectIndex !== null) {
+      const imgs = (projects[selectedProjectIndex].images && projects[selectedProjectIndex].images.length)
+        ? projects[selectedProjectIndex].images
+        : (projects[selectedProjectIndex].image ? [projects[selectedProjectIndex].image] : []);
+      if (!imgs.length) return;
+      setCurrentImageIndex((prev) => (prev === imgs.length - 1 ? 0 : prev + 1));
+    } else if (previewType === 'certification' && selectedCertIndex !== null) {
+      const imgs = (certifications[selectedCertIndex].images && certifications[selectedCertIndex].images.length)
+        ? certifications[selectedCertIndex].images
+        : (certifications[selectedCertIndex].image ? [certifications[selectedCertIndex].image] : []);
+      if (!imgs.length) return;
+      setCurrentImageIndex((prev) => (prev === imgs.length - 1 ? 0 : prev + 1));
+    }
   };
 
-  const technologies = [
-    "Qiskit",
-    "IBM Quantum",
-    "Python",
-    "React",
-    "Quantum Algorithms",
-    "NumPy",
-    "JavaScript",
-    "Docker"
-  ];
 
   const projects = [
     {
@@ -115,6 +131,16 @@ export default function App() {
     
   ];
 
+  const certifications = [
+    {
+      title: "Quantum Diagonalization Algorithms",
+      issuer: "IBM Quantum",
+      date: "2026-02",
+      image: "/Quantum certificate 1.png",
+      verifyLink: "https://www.credly.com/badges/d8e94d9b-bc6f-453b-b628-b2b06a238986/linked_in_profile"
+    },
+  ];
+
   return (
     <div className="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 text-gray-200 min-h-screen">
       {/* Navigation */}
@@ -126,7 +152,7 @@ export default function App() {
           <div className="hidden md:flex gap-16">
             <a href="#about" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">about</a>
             <a href="#work" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">projects</a>
-            <a href="#tech" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">tech</a>
+            <a href="#certifications" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">certifications</a>
             <a href="#contact" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">contact</a>
           </div>
         </div>
@@ -186,11 +212,15 @@ export default function App() {
           <div className="about-layout">
             <div className="about-text text-gray-400 font-light leading-relaxed">
               <p>
-                I'm an undergraduate student exploring <span className="text-cyan-400">quantum computing</span>. I enjoy working with new concepts, building quantum circuits, and experimenting with algorithms that try to make sense of complex quantum systems and solve problems.
+                I'm an undergraduate student passionate about emerging <span className="text-cyan-400">quantum technologies</span>, with a strong interest in <span className="text-cyan-400">quantum algorithms</span> in particular.
               </p>
 
               <p>
-                I like learning by doing—running simulations, testing ideas, and slowly turning theory into something practical. I'm still early in the journey, but I'm excited to keep building projects and growing in the quantum space.
+                I actively pursue certifications and hands-on projects focused on <span className="text-cyan-400">quantum algorithms</span>, quantum circuits, and <span className="text-cyan-400">quantum chemistry</span>, and I'm preparing to dive deeper into <span className="text-cyan-400">Quantum Machine Learning</span>. While I'm still in the early stages of my learning journey, I'm committed to building a strong theoretical foundation and practical skill set in this field.
+              </p>
+
+              <p>
+                I'm always open to connecting with researchers, developers, and professionals in quantum computing, and I'm actively seeking opportunities to learn, collaborate, and grow within the quantum ecosystem.
               </p>
             </div>
 
@@ -259,42 +289,60 @@ export default function App() {
         </div>
       </section>
 
-      {/* Technologies Section */}
-      <section id="tech" className="section-container">
+      {/* Certifications Section */}
+      <section id="certifications" className="section-container">
         <div className="section-content-wrapper">
           <div className="section-header">
             <h2 className="section-title text-cyan-500">
-              <span className="text-cyan-500">/</span> tech stack
+              <span className="text-cyan-500">/</span> certifications and licenses
             </h2>
             <div className="section-divider"></div>
           </div>
 
-          <div className="tech-layout">
-            {/* Technologies Grid */}
-            <div className="tech-grid">
-              {technologies.map((tech, idx) => (
+          <div className="work-grid">
+            {certifications.map((cert, idx) => (
+              <div 
+                key={idx}
+                className="group flex flex-col border border-cyan-500/20 rounded-lg overflow-hidden hover:border-cyan-500/50 transition-all duration-300 bg-slate-900/30 hover:bg-slate-900/60"
+              >
                 <div 
-                  key={idx}
-                  className="tech-grid-item text-gray-400 hover:text-cyan-400 transition-colors duration-300 group cursor-pointer"
+                  className="relative h-48 overflow-hidden bg-slate-900 cursor-pointer"
+                  onClick={() => handleCertImageClick(idx)}
                 >
-                  <span className="text-cyan-500 group-hover:translate-x-1 transition-transform">▸</span>
-                  <span className="font-light">{tech}</span>
+                  <img 
+                    src={cert.image}
+                    alt={cert.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
-              ))}
-            </div>
-
-            {/* Visual Grid */}
-            <div className="tech-visual">
-              <div className="tech-visual-grid">
-                {Array(9).fill(0).map((_, idx) => (
-                  <div 
-                    key={idx} 
-                    className="tech-visual-item animate-blink-box"
-                    style={{animationDelay: `${idx * 0.2}s`}}
-                  ></div>
-                ))}
+                
+                <div className="flex flex-col flex-grow p-6 space-y-4">
+                  <h3 className="text-lg font-light text-gray-100 group-hover:text-cyan-400 transition-colors">
+                    {cert.title}
+                  </h3>
+                  
+                  <p className="text-cyan-400 font-light text-sm">
+                    {cert.issuer}
+                  </p>
+                  
+                  <p className="text-gray-400 font-light text-sm flex-grow">
+                    {cert.date}
+                  </p>
+                  
+                  <a 
+                    href={cert.verifyLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-cyan-500/30 rounded text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/60 hover:bg-cyan-500/10 transition-all text-sm font-light mt-auto"
+                  >
+                    Show credential
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -401,7 +449,7 @@ export default function App() {
       )}
 
       {/* Image Preview Modal */}
-      {showImagePreview && selectedProjectIndex !== null && (
+      {showImagePreview && (previewType === 'project' ? selectedProjectIndex !== null : selectedCertIndex !== null) && (
         <>
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
@@ -434,13 +482,20 @@ export default function App() {
               {/* Image */}
               <div className="modal-image-container">
                 <img
-                  src={projects[selectedProjectIndex]?.images?.length ? projects[selectedProjectIndex].images[currentImageIndex] : projects[selectedProjectIndex]?.image}
-                  alt={projects[selectedProjectIndex]?.title}
+                  src={previewType === 'project' 
+                    ? (projects[selectedProjectIndex]?.images?.length ? projects[selectedProjectIndex].images[currentImageIndex] : projects[selectedProjectIndex]?.image)
+                    : (certifications[selectedCertIndex]?.images?.length ? certifications[selectedCertIndex].images[currentImageIndex] : certifications[selectedCertIndex]?.image)
+                  }
+                  alt={previewType === 'project' ? projects[selectedProjectIndex]?.title : certifications[selectedCertIndex]?.title}
                   className="w-full h-auto max-h-[400px] object-contain rounded-lg"
                 />
                 <div className="modal-image-content">
-                  <h3 className="modal-title text-cyan-400 font-light">{projects[selectedProjectIndex]?.title}</h3>
-                  <p className="modal-description text-gray-400 mt-2">{projects[selectedProjectIndex]?.desc}</p>
+                  <h3 className="modal-title text-cyan-400 font-light">
+                    {previewType === 'project' ? projects[selectedProjectIndex]?.title : certifications[selectedCertIndex]?.title}
+                  </h3>
+                  <p className="modal-description text-gray-400 mt-2">
+                    {previewType === 'project' ? projects[selectedProjectIndex]?.desc : `${certifications[selectedCertIndex]?.issuer} - ${certifications[selectedCertIndex]?.date}`}
+                  </p>
                 </div>
               </div>
 
@@ -457,7 +512,10 @@ export default function App() {
 
               {/* Image counter */}
               <div className="text-center mt-2 text-white text-sm">
-                {currentImageIndex + 1} / {(projects[selectedProjectIndex]?.images?.length) ? projects[selectedProjectIndex].images.length : (projects[selectedProjectIndex]?.image ? 1 : 0)}
+                {currentImageIndex + 1} / {previewType === 'project' 
+                  ? ((projects[selectedProjectIndex]?.images?.length) ? projects[selectedProjectIndex].images.length : (projects[selectedProjectIndex]?.image ? 1 : 0))
+                  : ((certifications[selectedCertIndex]?.images?.length) ? certifications[selectedCertIndex].images.length : (certifications[selectedCertIndex]?.image ? 1 : 0))
+                }
               </div>
             </div>
           </div>
