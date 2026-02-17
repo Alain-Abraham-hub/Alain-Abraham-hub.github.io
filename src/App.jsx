@@ -141,6 +141,23 @@ export default function App() {
     },
   ];
 
+  const education = [
+    {
+      title: "Bachelor of Technology in Artificial Intelligence and Data Science",
+      school: "Karuna Institute of Technology and Sciences",
+      date: "Expected 2028",
+      logo: "/karunya logo.png",
+      link: "http://www.karunya.edu/"  
+    },
+    {
+      title: "Engineering and Science(STEM subjects)",
+      school: "SSVM Institutions",
+      date: "2024",
+      logo: "/ssvm logo.jpeg",
+      link: "https://ssvminstitutions.ac.in/"  
+    },
+  ];
+
   return (
     <div className="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 text-gray-200 min-h-screen">
       {/* Navigation */}
@@ -153,6 +170,7 @@ export default function App() {
             <a href="#about" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">about</a>
             <a href="#work" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">projects</a>
             <a href="#certifications" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">certifications</a>
+            <a href="#education" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">education</a>
             <a href="#contact" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">contact</a>
           </div>
         </div>
@@ -347,6 +365,56 @@ export default function App() {
         </div>
       </section>
 
+      {/* Education Section */}
+      <section id="education" className="section-container">
+        <div className="section-content-wrapper">
+          <div className="section-header">
+            <h2 className="section-title text-cyan-500">
+              <span className="text-cyan-500">/</span> education
+            </h2>
+            <div className="section-divider"></div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', paddingLeft: '1rem' }}>
+            {education.map((edu, idx) => (
+              <div key={idx}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                  <div className="logo-placeholder">
+                    {edu.logo ? (
+                      <img src={edu.logo} alt={edu.school} className="logo-image" />
+                    ) : (
+                      <div className="logo-empty">{edu.school.substring(0, 1)}</div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-light text-cyan-400 mb-1">
+                      {edu.school}
+                    </h3>
+                    <p className="text-gray-300 font-light mb-2">
+                      {edu.title}
+                    </p>
+                    <p className="text-gray-500 font-light text-sm mb-2">
+                      {edu.date}
+                    </p>
+                    <p className="text-gray-400 font-light text-sm">
+                      {edu.description}
+                    </p>
+                    {edu.link && (
+                      <a href={edu.link} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 text-sm font-light mt-2 inline-block transition-colors">
+                        Visit Website →
+                      </a>
+                    )}
+                  </div>
+                </div>
+                {idx < education.length - 1 && (
+                  <div style={{ width: '2px', height: '5rem', background: 'rgba(34, 211, 238, 0.5)', marginLeft: 'calc(2.5rem - 1px)' }}></div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Contact Section */}
       <section id="contact" className="section-container">
         <div className="section-content-wrapper">
@@ -357,9 +425,9 @@ export default function App() {
             <div className="section-divider"></div>
           </div>
 
-          <div className="tech-layout">
-            <div>
-              <p className="text-gray-500 font-light leading-relaxed mb-6 -mt-20 max-w-4xl">
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem', width: '100%' }}>
+            <div style={{ flex: '2 1 auto', minWidth: '0' }}>
+              <p style={{ width: '100%', margin: '0 0 1.5rem 0', marginTop: '-5rem', color: '#a3a3a3', fontWeight: '300', lineHeight: '1.6', fontSize: '1rem' }}>
                 I'm always interested in collaborating on quantum computing projects, discussing 
                 algorithms, or just talking about the future of quantum computing.
               </p>
@@ -385,6 +453,16 @@ export default function App() {
                     <path d="M22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0zM7.059 20.452H3.558V9h3.501v11.452zM5.308 7.433a2.03 2.03 0 1 1 0-4.059 2.03 2.03 0 0 1 0 4.059zM20.452 20.452h-3.5v-5.569c0-1.328-.475-2.236-1.986-2.236-1.081 0-1.722.731-2.004 1.438-.103.249-.129.597-.129.946v5.421h-3.5V9h3.5v1.573c.503-.777 1.402-1.884 3.413-1.884 2.493 0 4.206 1.574 4.206 4.956v6.807z"/>
                   </svg>
                 </a>
+                <a 
+                  href="https://leetcode.com/Alain_Abraham"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="contact-link hover:text-cyan-300 hover:border-cyan-500/60"
+                >
+                  <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l.596.598c.54.54 1.413.54 1.954 0 .539-.54.539-1.414 0-1.955l-.598-.597a5.183 5.183 0 0 0-1.952-1.103c-.16-.058-.33-.098-.496-.138-.309-.073-.626-.12-.94-.122zM19.48 9.105l-4.276 4.272c-.652.64-.972 1.469-.948 2.263.01.34.078.68.212.995.134.315.328.614.595.88l4.276 4.194c.652.64 1.517.948 2.349.911a2.991 2.991 0 0 0 1.831-.877c.654-.662.96-1.529.92-2.371a3.005 3.005 0 0 0-.873-1.843l-4.276-4.193a1.378 1.378 0 0 0-1.951-.003c-.54.54-.54 1.415-.003 1.955l4.276 4.194c.093.09.15.213.155.343a.446.446 0 0 1-.139.327.446.446 0 0 1-.329.137.452.452 0 0 1-.345-.152l-4.276-4.193a.453.453 0 0 1-.003-.649c.01-.34.078-.68.212-.995a.453.453 0 0 1 .352-.15l4.276-4.272c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003z"/>
+                  </svg>
+                </a>
                 <div className="relative">
                   <button 
                     onClick={() => setShowEmailPopup(!showEmailPopup)}
@@ -397,19 +475,6 @@ export default function App() {
                   </button>
                 </div>
               </div>
-            </div>
-
-            <div className="tech-visual">
-              <svg className="connect-nodes-animation" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
-              <line x1="40" y1="40" x2="160" y2="160" stroke="rgba(34, 211, 238, 0.4)" strokeWidth="2"/>
-              <line x1="160" y1="40" x2="40" y2="160" stroke="rgba(34, 211, 238, 0.4)" strokeWidth="2"/>
-              
-              <circle cx="40" cy="40" r="8" fill="rgba(34, 211, 238, 0.9)" className="connect-node" style={{animationDelay: "0s"}}/>
-              <circle cx="160" cy="40" r="8" fill="rgba(59, 130, 246, 0.9)" className="connect-node-bright" style={{animationDelay: "0.3s"}}/>
-              <circle cx="100" cy="100" r="9" fill="rgba(96, 165, 250, 0.95)" className="connect-node-center" style={{animationDelay: "0.6s"}}/>
-              <circle cx="40" cy="160" r="8" fill="rgba(34, 211, 238, 0.9)" className="connect-node" style={{animationDelay: "0.9s"}}/>
-              <circle cx="160" cy="160" r="8" fill="rgba(100, 150, 200, 0.8)" className="connect-node-muted" style={{animationDelay: "1.2s"}}/>
-            </svg>
             </div>
           </div>
         </div>
@@ -455,8 +520,8 @@ export default function App() {
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
             onClick={() => setShowImagePreview(false)}
           ></div>
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-            <div className="relative bg-slate-900 border border-cyan-500/40 rounded-lg shadow-2xl p-6 max-w-2xl">
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-11/12">
+            <div className="relative bg-slate-900 border border-cyan-500/40 rounded-lg shadow-2xl p-4">
               {/* Close button */}
               <button
                 onClick={() => setShowImagePreview(false)}
