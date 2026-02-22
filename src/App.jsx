@@ -1,10 +1,150 @@
 import { useEffect, useRef, useState } from "react";
 
+function QuantumPortrait() {
+  const canvasRef = useRef(null);
+  const containerRef = useRef(null);
+  const mouseRef = useRef({ x: null, y: null });
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return;
+
+    const size = 260;
+    canvas.width = size;
+    canvas.height = size;
+
+    const getCanvasCoords = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = size / rect.width;
+      const scaleY = size / rect.height;
+      return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY,
+      };
+    };
+
+    const handleMouseMove = (e) => {
+      mouseRef.current = getCanvasCoords(e);
+    };
+    const handleMouseLeave = () => {
+      mouseRef.current = { x: null, y: null };
+    };
+
+    canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("mouseleave", handleMouseLeave);
+
+    const img = new Image();
+    img.src = "/433e0922-21cd-46bc-9d24-4222c4b2eeab.jpg";
+    let animationFrameId;
+
+    img.onload = () => {
+      const offscreen = document.createElement("canvas");
+      offscreen.width = size;
+      offscreen.height = size;
+      const offCtx = offscreen.getContext("2d");
+      if (!offCtx) return;
+
+      const scale = Math.max(size / img.width, size / img.height);
+      const drawWidth = img.width * scale;
+      const drawHeight = img.height * scale;
+      const dx = (size - drawWidth) / 2;
+      const dy = (size - drawHeight) / 2;
+
+      offCtx.drawImage(img, dx, dy, drawWidth, drawHeight);
+      const imageData = offCtx.getImageData(0, 0, size, size).data;
+
+      const rows = 70;
+      const cols = 50;
+      const cellW = size / cols;
+      const cellH = size / rows;
+
+      const samples = [];
+      for (let r = 0; r < rows; r += 1) {
+        for (let c = 0; c < cols; c += 1) {
+          const sx = Math.floor(c * cellW + cellW / 2);
+          const sy = Math.floor(r * cellH + cellH / 2);
+          const idx = (sy * size + sx) * 4;
+          const rCol = imageData[idx];
+          const gCol = imageData[idx + 1];
+          const bCol = imageData[idx + 2];
+          const brightness = (rCol + gCol + bCol) / (3 * 255);
+          if (brightness < 0.12) continue;
+          samples.push({
+            x: sx,
+            y: sy,
+            brightness,
+            row: r,
+          });
+        }
+      }
+
+      const radius = 70;
+      let t = 0;
+      const render = () => {
+        t += 0.04;
+        ctx.clearRect(0, 0, size, size);
+
+        const { x: mx, y: my } = mouseRef.current;
+
+        samples.forEach((s) => {
+          let base = 0.25 + s.brightness * 0.7;
+          const wave = 0.4 + 0.3 * Math.sin(t + s.row * 0.22);
+          let alpha = Math.min(1, base * wave);
+          let length = cellW * (0.4 + s.brightness * 1.1);
+
+          if (mx != null && my != null) {
+            const dx = s.x - mx;
+            const dy = s.y - my;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < radius) {
+              const factor = 1 - dist / radius;
+              alpha = Math.min(1, alpha * (1 + factor * 0.8));
+              length *= 1 + factor * 0.4;
+            }
+          }
+
+          ctx.strokeStyle = `rgba(34, 211, 238, ${alpha})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(s.x - length / 2, s.y);
+          ctx.lineTo(s.x + length / 2, s.y);
+          ctx.stroke();
+        });
+
+        animationFrameId = requestAnimationFrame(render);
+      };
+
+      render();
+    };
+
+    return () => {
+      canvas.removeEventListener("mousemove", handleMouseMove);
+      canvas.removeEventListener("mouseleave", handleMouseLeave);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    <div ref={containerRef} className="hero-bloch cursor-crosshair">
+      <canvas
+        ref={canvasRef}
+        className="w-[18rem] h-[18rem] md:w-[22rem] md:h-[22rem]"
+      />
+    </div>
+  );
+}
+
 export default function App() {
   const emailAddress = "alainabrahamsj@gmail.com";
   const [showEmailPopup, setShowEmailPopup] = useState(false);
   const [copyStatus, setCopyStatus] = useState("");
   const copyTimer = useRef(null);
+  const [aboutImgTilt, setAboutImgTilt] = useState({ x: 0, y: 0 });
+  const aboutImgRef = useRef(null);
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedProjectIndex, setSelectedProjectIndex] = useState(null);
@@ -159,58 +299,38 @@ export default function App() {
   ];
 
   return (
-    <div className="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 text-gray-200 min-h-screen">
+    <div className="bg-page text-gray-200 min-h-screen">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full backdrop-blur-sm bg-slate-950/80 border-b border-cyan-500/20 z-50">
+      <nav className="fixed top-0 left-0 right-0 w-full backdrop-blur-md bg-slate-950/70 border-b border-cyan-500/20 z-50">
         <div className="nav-container">
-          <a href="#home" className="text-xl font-light tracking-wide text-gray-100 hover:text-cyan-400 transition-colors">
-            <span className="text-cyan-500">/</span> alain's portfolio
+          <a href="#home" className="text-xl font-semibold tracking-tight text-gray-100 hover:text-cyan-400 transition-colors duration-200">
+            <span className="text-cyan-400">/</span> alain's portfolio
           </a>
-          <div className="hidden md:flex gap-16">
-            <a href="#about" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">about</a>
-            <a href="#work" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">projects</a>
-            <a href="#certifications" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">certifications</a>
-            <a href="#education" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">education</a>
-            <a href="#contact" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">contact</a>
+          <div className="hidden md:flex gap-12">
+            <a href="#about" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">about</a>
+            <a href="#work" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">projects</a>
+            <a href="#certifications" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">certifications</a>
+            <a href="#education" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">education</a>
+            <a href="#contact" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">contact</a>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
       <section id="home" className="min-h-screen flex items-center hero-section">
-        {/* Bloch Sphere Visualization Left */}
-        <div className="hero-bloch relative w-[26rem] h-[26rem]">
-          <svg className="absolute w-[22rem] h-[22rem]" viewBox="0 0 300 300">
-            {/* Bloch sphere wireframe */}
-            <ellipse cx="150" cy="150" rx="100" ry="40" fill="none" stroke="rgba(34, 211, 238, 0.2)" strokeWidth="1" className="animate-spin" style={{animationDuration: '10s', transformOrigin: 'center'}} />
-            <circle cx="150" cy="150" r="100" fill="none" stroke="rgba(34, 211, 238, 0.3)" strokeWidth="1" style={{animation: 'spin-reverse 10s linear infinite', transformOrigin: 'center'}} />
-            <ellipse cx="150" cy="150" rx="100" ry="100" fill="none" stroke="rgba(34, 211, 238, 0.25)" strokeWidth="1" transform="rotate(45 150 150)" />
-            
-            {/* Axes */}
-            <line x1="150" y1="50" x2="150" y2="250" stroke="rgba(6, 182, 212, 0.1)" strokeWidth="1" />
-            <line x1="50" y1="150" x2="250" y2="150" stroke="rgba(6, 182, 212, 0.1)" strokeWidth="1" />
-            
-            {/* Center */}
-            <circle cx="150" cy="150" r="6" fill="#06b6d4" />
-            
-            {/* Probability amplitudes */}
-            <circle cx="220" cy="130" r="3" fill="#06b6d4" opacity="0.6" />
-            <circle cx="210" cy="160" r="2.5" fill="#06b6d4" opacity="0.4" />
-            <circle cx="180" cy="190" r="2" fill="#06b6d4" opacity="0.3" />
-          </svg>
-        </div>
+        <QuantumPortrait />
 
         {/* Right content */}
         <div className="hero-content">
           <div>
-            <p className="hero-tagline text-cyan-400 mb-4 font-mono">&lt; Quantum_dev.init() /&gt;</p>
-            <h1 className="hero-title font-light tracking-tight text-white leading-tight">
-              hi, welcome to my portfolio<span className="animate-blink">|</span>
+            <p className="hero-tagline text-cyan-400 mb-4 font-mono text-sm tracking-wide opacity-90">&lt; Quantum_dev.init() /&gt;</p>
+            <h1 className="hero-title text-white leading-[1.1]">
+              hi, welcome to my portfolio<span className="animate-blink text-cyan-400">|</span>
             </h1>
           </div>
 
           <div className="pt-12 flex justify-center md:justify-start">
-            <a href="#about" className="text-cyan-400 hover:text-cyan-300 transition-colors text-2xl animate-bounce-arrow">
+            <a href="#about" className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-cyan-500/30 text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-500/5 transition-all duration-200 text-xl animate-bounce-arrow">
               ↓
             </a>
           </div>
@@ -234,21 +354,36 @@ export default function App() {
               </p>
 
               <p>
-                I actively pursue certifications and hands-on projects focused on <span className="text-cyan-400">quantum algorithms</span>, quantum circuits, and <span className="text-cyan-400">quantum chemistry</span>, and I'm preparing to dive deeper into <span className="text-cyan-400">Quantum Machine Learning</span>. While I'm still in the early stages of my learning journey, I'm committed to building a strong theoretical foundation and practical skill set in this field.
+                I actively pursue certifications and hands-on projects focused on <span className="text-cyan-400">quantum algorithms</span>, <span className="text-cyan-400">quantum circuits</span>, and <span className="text-cyan-400">quantum chemistry</span>, and I'm preparing to dive deeper into <span className="text-cyan-400">Quantum Machine Learning</span>. While I'm still in the early stages of my learning journey, I'm committed to building a strong theoretical foundation and practical skill set in this field.
               </p>
 
-              <p>
-                I'm always open to connecting with researchers, developers, and professionals in quantum computing, and I'm actively seeking opportunities to learn, collaborate, and grow within the quantum ecosystem.
-              </p>
             </div>
 
             <div className="about-image-container">
-              <div className="about-image-wrapper">
-                <div className="about-image-small absolute inset-0 bg-yellow-400/25 rounded-full blur-2xl animate-pulse"></div>
+              <div
+                ref={aboutImgRef}
+                className="about-image-wrapper"
+                onMouseMove={(e) => {
+                  const el = aboutImgRef.current;
+                  if (!el) return;
+                  const rect = el.getBoundingClientRect();
+                  const x = (e.clientX - rect.left) / rect.width - 0.5;
+                  const y = (e.clientY - rect.top) / rect.height - 0.5;
+                  setAboutImgTilt({ x: y * 10, y: -x * 10 });
+                }}
+                onMouseLeave={() => setAboutImgTilt({ x: 0, y: 0 })}
+              >
+                <div
+                  className="about-image-small absolute inset-0 bg-yellow-400/25 rounded-full blur-2xl animate-pulse"
+                  aria-hidden
+                />
                 <img
                   src="/433e0922-21cd-46bc-9d24-4222c4b2eeab.jpg"
                   alt="Alain Abraham"
-                  className="about-image-small relative rounded-full border-4 border-yellow-400/40 shadow-xl shadow-yellow-400/30 object-cover"
+                  className="about-image-small relative rounded-full border-4 border-yellow-400/40 shadow-xl shadow-yellow-400/30 object-cover transition-transform duration-150 ease-out"
+                  style={{
+                    transform: `perspective(500px) rotateX(${aboutImgTilt.x}deg) rotateY(${aboutImgTilt.y}deg)`,
+                  }}
                 />
               </div>
             </div>
@@ -270,25 +405,25 @@ export default function App() {
             {projects.map((project, idx) => (
               <div 
                 key={idx}
-                className="group flex flex-col border border-cyan-500/20 rounded-lg overflow-hidden hover:border-cyan-500/50 transition-all duration-300 bg-slate-900/30 hover:bg-slate-900/60"
+                className="group flex flex-col card-project"
               >
                 <div 
-                  className="relative h-48 overflow-hidden bg-slate-900 cursor-pointer"
+                  className="card-image-wrap relative h-44 sm:h-48 bg-slate-900 cursor-pointer"
                   onClick={() => handleImageClick(idx)}
                 >
                   <img 
                     src={project.images?.length ? project.images[0] : project.image}
                     alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 
-                <div className="flex flex-col flex-grow p-6 space-y-4">
-                  <h3 className="text-lg font-light text-gray-100 group-hover:text-cyan-400 transition-colors">
+                <div className="flex flex-col flex-grow p-5 sm:p-6 space-y-3">
+                  <h3 className="text-lg font-medium text-gray-100 group-hover:text-cyan-400 transition-colors duration-200">
                     {project.title}
                   </h3>
                   
-                  <p className="text-gray-400 font-light text-sm leading-relaxed flex-grow">
+                  <p className="text-gray-400 font-light text-sm leading-relaxed flex-grow line-clamp-3">
                     {project.desc}
                   </p>
                   
@@ -296,7 +431,7 @@ export default function App() {
                     href={project.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-cyan-500/30 rounded text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/60 hover:bg-cyan-500/10 transition-all text-sm font-light mt-auto"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-cyan-500/30 rounded-lg text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all duration-200 text-sm font-medium mt-auto"
                   >
                     View on GitHub
                   </a>
@@ -321,29 +456,29 @@ export default function App() {
             {certifications.map((cert, idx) => (
               <div 
                 key={idx}
-                className="group flex flex-col border border-cyan-500/20 rounded-lg overflow-hidden hover:border-cyan-500/50 transition-all duration-300 bg-slate-900/30 hover:bg-slate-900/60"
+                className="group flex flex-col card-cert"
               >
                 <div 
-                  className="relative h-48 overflow-hidden bg-slate-900 cursor-pointer"
+                  className="card-image-wrap relative h-44 sm:h-48 bg-slate-900 cursor-pointer"
                   onClick={() => handleCertImageClick(idx)}
                 >
                   <img 
                     src={cert.image}
                     alt={cert.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 
-                <div className="flex flex-col flex-grow p-6 space-y-4">
-                  <h3 className="text-lg font-light text-gray-100 group-hover:text-cyan-400 transition-colors">
+                <div className="flex flex-col flex-grow p-5 sm:p-6 space-y-3">
+                  <h3 className="text-lg font-medium text-gray-100 group-hover:text-cyan-400 transition-colors duration-200">
                     {cert.title}
                   </h3>
                   
-                  <p className="text-cyan-400 font-light text-sm">
+                  <p className="text-cyan-400 font-medium text-sm">
                     {cert.issuer}
                   </p>
                   
-                  <p className="text-gray-400 font-light text-sm flex-grow">
+                  <p className="text-gray-500 font-light text-sm flex-grow">
                     {cert.date}
                   </p>
                   
@@ -351,7 +486,7 @@ export default function App() {
                     href={cert.verifyLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-cyan-500/30 rounded text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/60 hover:bg-cyan-500/10 transition-all text-sm font-light mt-auto"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-cyan-500/30 rounded-lg text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all duration-200 text-sm font-medium mt-auto"
                   >
                     Show credential
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -375,10 +510,10 @@ export default function App() {
             <div className="section-divider"></div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', paddingLeft: '1rem' }}>
+          <div className="flex flex-col items-start pl-4">
             {education.map((edu, idx) => (
-              <div key={idx}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+              <div key={idx} className="w-full">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8">
                   <div className="logo-placeholder">
                     {edu.logo ? (
                       <img src={edu.logo} alt={edu.school} className="logo-image" />
@@ -386,28 +521,30 @@ export default function App() {
                       <div className="logo-empty">{edu.school.substring(0, 1)}</div>
                     )}
                   </div>
-                  <div>
-                    <h3 className="text-lg font-light text-cyan-400 mb-1">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-cyan-400 mb-1">
                       {edu.school}
                     </h3>
-                    <p className="text-gray-300 font-light mb-2">
+                    <p className="text-gray-300 font-light mb-1">
                       {edu.title}
                     </p>
                     <p className="text-gray-500 font-light text-sm mb-2">
                       {edu.date}
                     </p>
-                    <p className="text-gray-400 font-light text-sm">
-                      {edu.description}
-                    </p>
+                    {edu.description && (
+                      <p className="text-gray-400 font-light text-sm mb-2">
+                        {edu.description}
+                      </p>
+                    )}
                     {edu.link && (
-                      <a href={edu.link} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 text-sm font-light mt-2 inline-block transition-colors">
+                      <a href={edu.link} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 text-sm font-medium mt-2 inline-flex items-center gap-1 transition-colors duration-200">
                         Visit Website →
                       </a>
                     )}
                   </div>
                 </div>
                 {idx < education.length - 1 && (
-                  <div style={{ width: '2px', height: '5rem', background: 'rgba(34, 211, 238, 0.5)', marginLeft: 'calc(2.5rem - 1px)' }}></div>
+                  <div className="w-px h-20 bg-gradient-to-b from-cyan-500/50 to-transparent ml-[2.5rem] mt-6 mb-2" aria-hidden />
                 )}
               </div>
             ))}
@@ -425,10 +562,10 @@ export default function App() {
             <div className="section-divider"></div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem', width: '100%' }}>
-            <div style={{ flex: '2 1 auto', minWidth: '0' }}>
-              <p style={{ width: '100%', margin: '0 0 1.5rem 0', marginTop: '-5rem', color: '#a3a3a3', fontWeight: '300', lineHeight: '1.6', fontSize: '1rem' }}>
-                I'm always interested in collaborating on quantum computing projects, discussing 
+          <div className="flex flex-col sm:flex-row gap-8 w-full">
+            <div className="flex-[2_1_auto] min-w-0">
+              <p className="w-full mt-0 mb-6 text-gray-400 font-light leading-relaxed text-base max-w-xl">
+                I'm always interested in collaborating on quantum computing projects, discussing
                 algorithms, or just talking about the future of quantum computing.
               </p>
 
@@ -484,16 +621,17 @@ export default function App() {
       {showEmailPopup && (
         <>
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
             onClick={() => setShowEmailPopup(false)}
-          ></div>
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-            <div className="bg-slate-900 border border-cyan-500/40 rounded-lg shadow-2xl p-6 min-w-[320px]">
+            aria-hidden
+          />
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-md">
+            <div className="bg-slate-900/95 border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-500/5 p-6 backdrop-blur-sm">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-light text-cyan-400">Email Address</h3>
+                <h3 className="text-lg font-semibold text-cyan-400">Email Address</h3>
                 <button
                   onClick={() => setShowEmailPopup(false)}
-                  className="text-gray-400 hover:text-cyan-400 transition-colors"
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors duration-200"
                   aria-label="Close"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -501,10 +639,10 @@ export default function App() {
                   </svg>
                 </button>
               </div>
-              <p className="text-gray-300 mb-4 text-center break-all">{emailAddress}</p>
+              <p className="text-gray-300 mb-4 text-center break-all font-mono text-sm">{emailAddress}</p>
               <button
                 onClick={handleCopyEmail}
-                className="w-full px-4 py-2 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 rounded text-cyan-300 transition-all"
+                className="w-full px-4 py-2.5 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 rounded-lg text-cyan-300 font-medium transition-all duration-200"
               >
                 {copyStatus || "Copy"}
               </button>
@@ -517,15 +655,15 @@ export default function App() {
       {showImagePreview && (previewType === 'project' ? selectedProjectIndex !== null : selectedCertIndex !== null) && (
         <>
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
             onClick={() => setShowImagePreview(false)}
-          ></div>
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-11/12">
-            <div className="relative bg-slate-900 border border-cyan-500/40 rounded-lg shadow-2xl p-4">
-              {/* Close button */}
+            aria-hidden
+          />
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-3xl">
+            <div className="relative bg-slate-900/95 border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-500/5 p-4 sm:p-6 backdrop-blur-sm">
               <button
                 onClick={() => setShowImagePreview(false)}
-                className="absolute top-2 right-2 text-gray-400 hover:text-cyan-400 transition-colors z-10"
+                className="absolute top-3 right-3 p-2 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors duration-200 z-10"
                 aria-label="Close"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -533,18 +671,16 @@ export default function App() {
                 </svg>
               </button>
 
-              {/* Previous button */}
               <button
                 onClick={handlePrevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2 text-white hover:text-cyan-400 transition-colors bg-black/50 rounded-full p-2"
+                className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 text-white hover:text-cyan-400 transition-colors bg-black/50 hover:bg-cyan-500/20 rounded-full p-2.5 border border-cyan-500/20"
                 aria-label="Previous image"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
 
-              {/* Image */}
               <div className="modal-image-container">
                 <img
                   src={previewType === 'project' 
@@ -552,10 +688,10 @@ export default function App() {
                     : (certifications[selectedCertIndex]?.images?.length ? certifications[selectedCertIndex].images[currentImageIndex] : certifications[selectedCertIndex]?.image)
                   }
                   alt={previewType === 'project' ? projects[selectedProjectIndex]?.title : certifications[selectedCertIndex]?.title}
-                  className="w-full h-auto max-h-[400px] object-contain rounded-lg"
+                  className="w-full h-auto max-h-[70vh] object-contain rounded-lg"
                 />
                 <div className="modal-image-content">
-                  <h3 className="modal-title text-cyan-400 font-light">
+                  <h3 className="modal-title text-cyan-400 font-semibold">
                     {previewType === 'project' ? projects[selectedProjectIndex]?.title : certifications[selectedCertIndex]?.title}
                   </h3>
                   <p className="modal-description text-gray-400 mt-2">
@@ -564,19 +700,17 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Next button */}
               <button
                 onClick={handleNextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:text-cyan-400 transition-colors bg-black/50 rounded-full p-2"
+                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-white hover:text-cyan-400 transition-colors bg-black/50 hover:bg-cyan-500/20 rounded-full p-2.5 border border-cyan-500/20"
                 aria-label="Next image"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
 
-              {/* Image counter */}
-              <div className="text-center mt-2 text-white text-sm">
+              <div className="text-center mt-3 text-gray-400 text-sm font-medium">
                 {currentImageIndex + 1} / {previewType === 'project' 
                   ? ((projects[selectedProjectIndex]?.images?.length) ? projects[selectedProjectIndex].images.length : (projects[selectedProjectIndex]?.image ? 1 : 0))
                   : ((certifications[selectedCertIndex]?.images?.length) ? certifications[selectedCertIndex].images.length : (certifications[selectedCertIndex]?.image ? 1 : 0))
@@ -589,7 +723,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="footer-container border-t border-cyan-500/10">
-        <p className="footer-text text-gray-600 font-light">
+        <p className="footer-text text-gray-500">
           :) hope you found this page useful
         </p>
       </footer>
