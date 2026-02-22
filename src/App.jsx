@@ -132,7 +132,7 @@ function QuantumPortrait() {
     <div ref={containerRef} className="hero-bloch cursor-crosshair">
       <canvas
         ref={canvasRef}
-        className="w-[18rem] h-[18rem] md:w-[22rem] md:h-[22rem]"
+        className="quantum-portrait-canvas w-[18rem] h-[18rem] md:w-[22rem] md:h-[22rem]"
       />
     </div>
   );

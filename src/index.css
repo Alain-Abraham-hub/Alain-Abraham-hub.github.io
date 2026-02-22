@@ -36,6 +36,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.quantum-portrait-canvas {
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
 @keyframes blink {
   0% { opacity: 1; }
   50% { opacity: 0; }
