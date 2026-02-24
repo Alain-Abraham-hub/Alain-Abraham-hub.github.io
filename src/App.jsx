@@ -279,6 +279,13 @@ export default function App() {
       image: "/Quantum certificate 1.png",
       verifyLink: "https://www.credly.com/badges/d8e94d9b-bc6f-453b-b628-b2b06a238986/linked_in_profile"
     },
+    {
+      title: "Quantum Machine Learning",
+      issuer: "IBM Quantum",
+      date: "2026-02",
+      image: "/QML certificate.png",
+      verifyLink: "https://www.credly.com/badges/835a9210-1679-420c-91b9-c57ece0137b5/public_url"
+    },
   ];
 
   const education = [
