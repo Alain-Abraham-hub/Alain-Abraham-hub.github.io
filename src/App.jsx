@@ -286,6 +286,34 @@ export default function App() {
       image: "/QML certificate.png",
       verifyLink: "https://www.credly.com/badges/835a9210-1679-420c-91b9-c57ece0137b5/public_url"
     },
+    {
+      title: "AWS Academy Graduate - Cloud Foundations", 
+      issuer: "AWS web services",
+      date: "2025-04",
+      image: "/aws cloud foundation.png",
+      verifyLink: "https://www.credly.com/badges/00e33a77-7518-42da-a7f8-af208cc057bf/public_url"
+    },
+    {
+      title: "AWS Academy Graduate - Data Engineering",
+      issuer: "AWS web services",
+      date: "2025-04",
+      image: "/aws data engineering.png",
+      verifyLink: "https://www.credly.com/badges/760c2ec1-d8d0-4c01-976d-0347b511468b/public_url"
+    },
+    {
+      title: "Python essentials 2",
+      issuer: "Cisco",
+      date: "2025-03",
+      image: "/python essentials 2.png",
+      verifyLink: "https://www.credly.com/badges/4a374ccc-8787-402a-ae55-0a1e4419c53c/public_url"
+    },
+    {
+      title: "Python essentials 1",
+      issuer: "Cisco",
+      date: "2025-03",
+      image: "/python essentials 1.png",
+      verifyLink: "https://www.credly.com/badges/50861cad-2b2b-4bef-b5d1-c417a8025c5f/public_url"
+    }
   ];
 
   const education = [
