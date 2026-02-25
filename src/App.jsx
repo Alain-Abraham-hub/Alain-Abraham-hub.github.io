@@ -413,7 +413,7 @@ export default function App() {
                   aria-hidden
                 />
                 <img
-                  src="/433e0922-21cd-46bc-9d24-4222c4b2eeab.jpg"
+                  src="/profile pic.JPG"
                   alt="Alain Abraham"
                   className="about-image-small relative rounded-full border-4 border-yellow-400/40 shadow-xl shadow-yellow-400/30 object-cover transition-transform duration-150 ease-out"
                   style={{
