@@ -238,6 +238,12 @@ export default function App() {
       images: ["/qaoa circuit.jpeg", "/qaoa graph.jpeg", "qaoa 1.jpeg"],
     },
     {
+      title: "Ground state finder using VQE",
+      desc: "Implementing the VQE algorithm to find the ground state of a molecule.",
+      href: "https://github.com/Alain-Abraham-hub/GroundStateFinder.git",
+      images: ["/ground state finder.png"],
+    },
+    {
       title: "QKernels4Molecules",
       desc: "Exploring quantum-inspired feature maps and graph kernels for molecular machine learning.",
       href: "https://github.com/Alain-Abraham-hub/QKernels4Molecules.git",
