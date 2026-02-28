@@ -150,6 +150,8 @@ export default function App() {
   const [selectedProjectIndex, setSelectedProjectIndex] = useState(null);
   const [selectedCertIndex, setSelectedCertIndex] = useState(null);
   const [previewType, setPreviewType] = useState(null);
+  const [showAllProjects, setShowAllProjects] = useState(false);
+  const [showAllCerts, setShowAllCerts] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -443,7 +445,7 @@ export default function App() {
           </div>
 
           <div className="work-grid">
-            {projects.map((project, idx) => (
+            {projects.slice(0, 9).map((project, idx) => (
               <div 
                 key={idx}
                 className="group flex flex-col card-project"
@@ -480,6 +482,18 @@ export default function App() {
               </div>
             ))}
           </div>
+
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={() => setShowAllProjects(true)}
+              className="inline-flex items-center gap-3 px-8 py-3.5 border border-cyan-500/30 rounded-xl text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-500/10 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 text-base font-medium"
+            >
+              View All Projects ({projects.length})
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -494,7 +508,7 @@ export default function App() {
           </div>
 
           <div className="work-grid">
-            {certifications.map((cert, idx) => (
+            {certifications.slice(0, 6).map((cert, idx) => (
               <div 
                 key={idx}
                 className="group flex flex-col card-cert"
@@ -537,6 +551,18 @@ export default function App() {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={() => setShowAllCerts(true)}
+              className="inline-flex items-center gap-3 px-8 py-3.5 border border-cyan-500/30 rounded-xl text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-500/10 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 text-base font-medium"
+            >
+              View All Certifications ({certifications.length})
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </button>
           </div>
         </div>
       </section>
@@ -692,15 +718,164 @@ export default function App() {
         </>
       )}
 
+      {/* All Projects Modal */}
+      {showAllProjects && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-50"
+            onClick={() => setShowAllProjects(false)}
+            aria-hidden
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+            <div className="relative bg-slate-900/95 border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-500/5 backdrop-blur-sm w-full max-w-6xl max-h-[80vh] flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between p-5 sm:p-6 border-b border-cyan-500/20 shrink-0">
+                <h2 className="text-xl font-semibold text-cyan-400">
+                  <span className="text-cyan-500">/</span> all projects ({projects.length})
+                </h2>
+                <button
+                  onClick={() => setShowAllProjects(false)}
+                  className="p-2 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors duration-200"
+                  aria-label="Close"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {/* Scrollable Content */}
+              <div className="overflow-y-auto p-5 sm:p-6 custom-scrollbar">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {projects.map((project, idx) => (
+                    <div 
+                      key={idx}
+                      className="group flex flex-col card-project"
+                    >
+                      <div 
+                        className="card-image-wrap relative h-44 sm:h-48 bg-slate-900 cursor-pointer"
+                        onClick={() => handleImageClick(idx)}
+                      >
+                        <img 
+                          src={project.images?.length ? project.images[0] : project.image}
+                          alt={project.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      
+                      <div className="flex flex-col flex-grow p-5 sm:p-6 space-y-3">
+                        <h3 className="text-lg font-medium text-gray-100 group-hover:text-cyan-400 transition-colors duration-200">
+                          {project.title}
+                        </h3>
+                        
+                        <p className="text-gray-400 font-light text-sm leading-relaxed flex-grow line-clamp-3">
+                          {project.desc}
+                        </p>
+                        
+                        <a 
+                          href={project.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-cyan-500/30 rounded-lg text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all duration-200 text-sm font-medium mt-auto"
+                        >
+                          View on GitHub
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* All Certifications Modal */}
+      {showAllCerts && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-50"
+            onClick={() => setShowAllCerts(false)}
+            aria-hidden
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+            <div className="relative bg-slate-900/95 border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-500/5 backdrop-blur-sm w-full max-w-6xl max-h-[80vh] flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between p-5 sm:p-6 border-b border-cyan-500/20 shrink-0">
+                <h2 className="text-xl font-semibold text-cyan-400">
+                  <span className="text-cyan-500">/</span> all certifications ({certifications.length})
+                </h2>
+                <button
+                  onClick={() => setShowAllCerts(false)}
+                  className="p-2 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors duration-200"
+                  aria-label="Close"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {/* Scrollable Content */}
+              <div className="overflow-y-auto p-5 sm:p-6 custom-scrollbar">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {certifications.map((cert, idx) => (
+                    <div 
+                      key={idx}
+                      className="group flex flex-col card-cert"
+                    >
+                      <div 
+                        className="card-image-wrap relative h-44 sm:h-48 bg-slate-900 cursor-pointer"
+                        onClick={() => handleCertImageClick(idx)}
+                      >
+                        <img 
+                          src={cert.image}
+                          alt={cert.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      
+                      <div className="flex flex-col flex-grow p-5 sm:p-6 space-y-3">
+                        <h3 className="text-lg font-medium text-gray-100 group-hover:text-cyan-400 transition-colors duration-200">
+                          {cert.title}
+                        </h3>
+                        
+                        <p className="text-cyan-400 font-medium text-sm">
+                          {cert.issuer}
+                        </p>
+                        
+                        <p className="text-gray-500 font-light text-sm flex-grow">
+                          {cert.date}
+                        </p>
+                        
+                        <a 
+                          href={cert.verifyLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-cyan-500/30 rounded-lg text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all duration-200 text-sm font-medium mt-auto"
+                        >
+                          Show credential
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Image Preview Modal */}
       {showImagePreview && (previewType === 'project' ? selectedProjectIndex !== null : selectedCertIndex !== null) && (
         <>
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60]"
             onClick={() => setShowImagePreview(false)}
             aria-hidden
           />
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-3xl">
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] w-[calc(100%-2rem)] max-w-3xl">
             <div className="relative bg-slate-900/95 border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-500/5 p-4 sm:p-6 backdrop-blur-sm">
               <button
                 onClick={() => setShowImagePreview(false)}
