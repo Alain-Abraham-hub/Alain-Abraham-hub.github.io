@@ -36,7 +36,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.quantum-portrait-canvas {
+.quantum-portrait-canvas,
+.quantum-anim-canvas {
   border: none;
   outline: none;
   background: transparent;

@@ -1,125 +1,331 @@
 import { useEffect, useRef, useState } from "react";
 
-function QuantumPortrait() {
+function QuantumAnimation() {
   const canvasRef = useRef(null);
-  const containerRef = useRef(null);
   const mouseRef = useRef({ x: null, y: null });
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
+    if (!canvas) return;
 
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const size = 260;
+    const size = 360;
     canvas.width = size;
     canvas.height = size;
+    const cx = size / 2;
+    const cy = size / 2;
 
     const getCanvasCoords = (e) => {
       const rect = canvas.getBoundingClientRect();
-      const scaleX = size / rect.width;
-      const scaleY = size / rect.height;
       return {
-        x: (e.clientX - rect.left) * scaleX,
-        y: (e.clientY - rect.top) * scaleY,
+        x: ((e.clientX - rect.left) / rect.width) * size,
+        y: ((e.clientY - rect.top) / rect.height) * size,
       };
     };
-
-    const handleMouseMove = (e) => {
-      mouseRef.current = getCanvasCoords(e);
-    };
-    const handleMouseLeave = () => {
-      mouseRef.current = { x: null, y: null };
-    };
-
+    const handleMouseMove = (e) => { mouseRef.current = getCanvasCoords(e); };
+    const handleMouseLeave = () => { mouseRef.current = { x: null, y: null }; };
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("mouseleave", handleMouseLeave);
 
-    const img = new Image();
-    img.src = "/433e0922-21cd-46bc-9d24-4222c4b2eeab.jpg";
+    // --- Quantum particles floating in the background ---
+    const particles = Array.from({ length: 60 }, () => ({
+      x: Math.random() * size,
+      y: Math.random() * size,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 2 + 0.5,
+      phase: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.02 + 0.01,
+    }));
+
+    // --- Electron orbital definitions ---
+    const orbitals = [
+      { rx: 90, ry: 35, tilt: -0.4, speed: 0.018, phase: 0, electrons: 2 },
+      { rx: 110, ry: 45, tilt: 0.9, speed: -0.014, phase: 1.2, electrons: 2 },
+      { rx: 130, ry: 30, tilt: 2.1, speed: 0.01, phase: 2.8, electrons: 1 },
+    ];
+
+    // --- Probability wave rings ---
+    const waveRings = Array.from({ length: 4 }, (_, i) => ({
+      radius: 0,
+      maxRadius: 160,
+      speed: 0.4 + i * 0.1,
+      delay: i * 80,
+      frame: -i * 80,
+    }));
+
+    // --- Energy level transitions (photon emissions) ---
+    const photons = [];
+
+    let t = 0;
     let animationFrameId;
 
-    img.onload = () => {
-      const offscreen = document.createElement("canvas");
-      offscreen.width = size;
-      offscreen.height = size;
-      const offCtx = offscreen.getContext("2d");
-      if (!offCtx) return;
+    const render = () => {
+      t += 1;
+      ctx.clearRect(0, 0, size, size);
 
-      const scale = Math.max(size / img.width, size / img.height);
-      const drawWidth = img.width * scale;
-      const drawHeight = img.height * scale;
-      const dx = (size - drawWidth) / 2;
-      const dy = (size - drawHeight) / 2;
+      const { x: mx, y: my } = mouseRef.current;
+      const mouseActive = mx != null && my != null;
 
-      offCtx.drawImage(img, dx, dy, drawWidth, drawHeight);
-      const imageData = offCtx.getImageData(0, 0, size, size).data;
+      // --- Draw faint grid (quantum lattice) ---
+      ctx.strokeStyle = "rgba(34, 211, 238, 0.03)";
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < size; i += 30) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, size);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(size, i);
+        ctx.stroke();
+      }
 
-      const rows = 70;
-      const cols = 50;
-      const cellW = size / cols;
-      const cellH = size / rows;
+      // --- Background particles (quantum field) ---
+      particles.forEach((p) => {
+        p.phase += p.speed;
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = size;
+        if (p.x > size) p.x = 0;
+        if (p.y < 0) p.y = size;
+        if (p.y > size) p.y = 0;
 
-      const samples = [];
-      for (let r = 0; r < rows; r += 1) {
-        for (let c = 0; c < cols; c += 1) {
-          const sx = Math.floor(c * cellW + cellW / 2);
-          const sy = Math.floor(r * cellH + cellH / 2);
-          const idx = (sy * size + sx) * 4;
-          const rCol = imageData[idx];
-          const gCol = imageData[idx + 1];
-          const bCol = imageData[idx + 2];
-          const brightness = (rCol + gCol + bCol) / (3 * 255);
-          if (brightness < 0.12) continue;
-          samples.push({
-            x: sx,
-            y: sy,
-            brightness,
-            row: r,
-          });
+        // Mouse repulsion
+        if (mouseActive) {
+          const dx = p.x - mx;
+          const dy = p.y - my;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 80) {
+            const force = (80 - dist) / 80 * 0.8;
+            p.x += (dx / dist) * force;
+            p.y += (dy / dist) * force;
+          }
+        }
+
+        const alpha = 0.2 + 0.3 * Math.sin(p.phase);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(34, 211, 238, ${alpha})`;
+        ctx.fill();
+      });
+
+      // --- Draw connecting lines between nearby particles (entanglement) ---
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 50) {
+            ctx.strokeStyle = `rgba(34, 211, 238, ${0.08 * (1 - dist / 50)})`;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
         }
       }
 
-      const radius = 70;
-      let t = 0;
-      const render = () => {
-        t += 0.04;
-        ctx.clearRect(0, 0, size, size);
+      // --- Probability wave rings expanding from center ---
+      waveRings.forEach((ring) => {
+        ring.frame += 1;
+        if (ring.frame < 0) return;
+        ring.radius += ring.speed;
+        if (ring.radius > ring.maxRadius) ring.radius = 0;
 
-        const { x: mx, y: my } = mouseRef.current;
+        const alpha = 0.25 * (1 - ring.radius / ring.maxRadius);
+        ctx.strokeStyle = `rgba(34, 211, 238, ${alpha})`;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 6]);
+        ctx.beginPath();
+        ctx.arc(cx, cy, ring.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      });
 
-        samples.forEach((s) => {
-          let base = 0.25 + s.brightness * 0.7;
-          const wave = 0.4 + 0.3 * Math.sin(t + s.row * 0.22);
-          let alpha = Math.min(1, base * wave);
-          let length = cellW * (0.4 + s.brightness * 1.1);
+      // --- Nucleus glow ---
+      const glowPulse = 1 + 0.15 * Math.sin(t * 0.05);
+      const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, 30 * glowPulse);
+      gradient.addColorStop(0, "rgba(34, 211, 238, 0.6)");
+      gradient.addColorStop(0.3, "rgba(34, 211, 238, 0.2)");
+      gradient.addColorStop(0.6, "rgba(139, 92, 246, 0.1)");
+      gradient.addColorStop(1, "rgba(34, 211, 238, 0)");
+      ctx.beginPath();
+      ctx.arc(cx, cy, 30 * glowPulse, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
+      ctx.fill();
 
-          if (mx != null && my != null) {
-            const dx = s.x - mx;
-            const dy = s.y - my;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < radius) {
-              const factor = 1 - dist / radius;
-              alpha = Math.min(1, alpha * (1 + factor * 0.8));
-              length *= 1 + factor * 0.4;
-            }
-          }
+      // Inner nucleus
+      const nucleusGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 8);
+      nucleusGrad.addColorStop(0, "rgba(255, 255, 255, 0.9)");
+      nucleusGrad.addColorStop(0.5, "rgba(34, 211, 238, 0.7)");
+      nucleusGrad.addColorStop(1, "rgba(34, 211, 238, 0.0)");
+      ctx.beginPath();
+      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+      ctx.fillStyle = nucleusGrad;
+      ctx.fill();
 
-          ctx.strokeStyle = `rgba(34, 211, 238, ${alpha})`;
-          ctx.lineWidth = 2;
+      // --- Electron orbitals ---
+      orbitals.forEach((orb) => {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(orb.tilt);
+
+        // Draw orbital path (probability cloud)
+        const segments = 120;
+        ctx.beginPath();
+        for (let i = 0; i <= segments; i++) {
+          const angle = (i / segments) * Math.PI * 2;
+          const x = Math.cos(angle) * orb.rx;
+          const y = Math.sin(angle) * orb.ry;
+          // Wave-like probability amplitude modulation
+          const wave = 1 + 0.08 * Math.sin(angle * 6 + t * 0.03);
+          if (i === 0) ctx.moveTo(x * wave, y * wave);
+          else ctx.lineTo(x * wave, y * wave);
+        }
+        ctx.strokeStyle = "rgba(34, 211, 238, 0.12)";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Draw probability density along orbital (cloud effect)
+        for (let i = 0; i < 40; i++) {
+          const angle = (i / 40) * Math.PI * 2;
+          const x = Math.cos(angle) * orb.rx;
+          const y = Math.sin(angle) * orb.ry;
+          const prob = 0.5 + 0.5 * Math.sin(angle * 3 + t * 0.02 + orb.phase);
+          const cloudAlpha = prob * 0.06;
           ctx.beginPath();
-          ctx.moveTo(s.x - length / 2, s.y);
-          ctx.lineTo(s.x + length / 2, s.y);
-          ctx.stroke();
-        });
+          ctx.arc(x, y, 4 + prob * 3, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(139, 92, 246, ${cloudAlpha})`;
+          ctx.fill();
+        }
 
-        animationFrameId = requestAnimationFrame(render);
-      };
+        // Draw electrons
+        for (let e = 0; e < orb.electrons; e++) {
+          const eAngle = t * orb.speed + orb.phase + (e * Math.PI * 2) / orb.electrons;
+          const ex = Math.cos(eAngle) * orb.rx;
+          const ey = Math.sin(eAngle) * orb.ry;
 
-      render();
+          // Electron uncertainty cloud
+          const uncGrad = ctx.createRadialGradient(ex, ey, 0, ex, ey, 12);
+          uncGrad.addColorStop(0, "rgba(34, 211, 238, 0.5)");
+          uncGrad.addColorStop(0.5, "rgba(139, 92, 246, 0.15)");
+          uncGrad.addColorStop(1, "rgba(34, 211, 238, 0)");
+          ctx.beginPath();
+          ctx.arc(ex, ey, 12, 0, Math.PI * 2);
+          ctx.fillStyle = uncGrad;
+          ctx.fill();
+
+          // Electron core
+          ctx.beginPath();
+          ctx.arc(ex, ey, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+          ctx.fill();
+
+          // Emit photon occasionally
+          if (Math.random() < 0.005) {
+            photons.push({
+              x: ex,
+              y: ey,
+              tilt: orb.tilt,
+              vx: (Math.random() - 0.5) * 2,
+              vy: (Math.random() - 0.5) * 2,
+              life: 1,
+              decay: 0.015,
+            });
+          }
+        }
+
+        ctx.restore();
+      });
+
+      // --- Photon emissions ---
+      for (let i = photons.length - 1; i >= 0; i--) {
+        const ph = photons[i];
+        ph.x += ph.vx;
+        ph.y += ph.vy;
+        ph.life -= ph.decay;
+        if (ph.life <= 0) {
+          photons.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(ph.tilt);
+        const phGrad = ctx.createRadialGradient(ph.x, ph.y, 0, ph.x, ph.y, 6);
+        phGrad.addColorStop(0, `rgba(250, 204, 21, ${ph.life * 0.8})`);
+        phGrad.addColorStop(1, `rgba(250, 204, 21, 0)`);
+        ctx.beginPath();
+        ctx.arc(ph.x, ph.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = phGrad;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // --- Schrödinger wave function (bottom) ---
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(139, 92, 246, 0.3)";
+      ctx.lineWidth = 1.5;
+      for (let x = 0; x < size; x++) {
+        const y = cy + 120 + Math.sin(x * 0.04 + t * 0.03) * 15 * Math.exp(-((x - cx) ** 2) / 8000);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Second wave (superposition)
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(34, 211, 238, 0.2)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < size; x++) {
+        const y = cy + 120 + Math.cos(x * 0.05 - t * 0.025) * 12 * Math.exp(-((x - cx) ** 2) / 10000);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // --- Floating Dirac notation symbols ---
+      ctx.font = "12px 'Courier New', monospace";
+      ctx.fillStyle = `rgba(34, 211, 238, ${0.12 + 0.06 * Math.sin(t * 0.02)})`;
+      ctx.fillText("|ψ⟩", 20, 30 + Math.sin(t * 0.015) * 5);
+      ctx.fillText("⟨φ|", size - 45, 50 + Math.cos(t * 0.018) * 4);
+      ctx.fillText("ℏ", 35, size - 25 + Math.sin(t * 0.02 + 1) * 3);
+      ctx.fillText("Ĥ|ψ⟩ = E|ψ⟩", size / 2 - 40, 22 + Math.cos(t * 0.012) * 3);
+      ctx.fillStyle = `rgba(139, 92, 246, ${0.1 + 0.05 * Math.sin(t * 0.025)})`;
+      ctx.fillText("∫|ψ|²dx = 1", 15, size / 2 - 60 + Math.sin(t * 0.017) * 4);
+      ctx.fillText("ΔxΔp ≥ ℏ/2", size - 100, size - 20 + Math.cos(t * 0.02) * 3);
+
+      // --- Measurement collapse effect on click area ---
+      if (mouseActive) {
+        const collapseGrad = ctx.createRadialGradient(mx, my, 0, mx, my, 40);
+        collapseGrad.addColorStop(0, "rgba(250, 204, 21, 0.12)");
+        collapseGrad.addColorStop(0.5, "rgba(34, 211, 238, 0.05)");
+        collapseGrad.addColorStop(1, "rgba(34, 211, 238, 0)");
+        ctx.beginPath();
+        ctx.arc(mx, my, 40, 0, Math.PI * 2);
+        ctx.fillStyle = collapseGrad;
+        ctx.fill();
+
+        // Crosshair
+        ctx.strokeStyle = "rgba(34, 211, 238, 0.15)";
+        ctx.lineWidth = 0.5;
+        ctx.setLineDash([3, 4]);
+        ctx.beginPath();
+        ctx.moveTo(mx - 20, my);
+        ctx.lineTo(mx + 20, my);
+        ctx.moveTo(mx, my - 20);
+        ctx.lineTo(mx, my + 20);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      animationFrameId = requestAnimationFrame(render);
     };
+
+    render();
 
     return () => {
       canvas.removeEventListener("mousemove", handleMouseMove);
@@ -129,10 +335,10 @@ function QuantumPortrait() {
   }, []);
 
   return (
-    <div ref={containerRef} className="hero-bloch cursor-crosshair">
+    <div className="hero-bloch cursor-crosshair">
       <canvas
         ref={canvasRef}
-        className="quantum-portrait-canvas w-[18rem] h-[18rem] md:w-[22rem] md:h-[22rem]"
+        className="quantum-anim-canvas w-[18rem] h-[18rem] md:w-[22rem] md:h-[22rem]"
       />
     </div>
   );
@@ -148,6 +354,50 @@ export default function App() {
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedProjectIndex, setSelectedProjectIndex] = useState(null);
+
+  // Typewriter effect
+  const heroLines = ["hi, welcome to my portfolio", "this is alain abraham"];
+  const [lineIndex, setLineIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [displayedText, setDisplayedText] = useState("");
+  const [typePause, setTypePause] = useState(false);
+
+  useEffect(() => {
+    const current = heroLines[lineIndex];
+    let timeout;
+
+    if (typePause) {
+      timeout = setTimeout(() => {
+        setTypePause(false);
+        setIsDeleting(true);
+      }, 2000);
+      return () => clearTimeout(timeout);
+    }
+
+    if (!isDeleting) {
+      if (charIndex < current.length) {
+        timeout = setTimeout(() => {
+          setDisplayedText(current.slice(0, charIndex + 1));
+          setCharIndex(charIndex + 1);
+        }, 80);
+      } else {
+        setTypePause(true);
+      }
+    } else {
+      if (charIndex > 0) {
+        timeout = setTimeout(() => {
+          setDisplayedText(current.slice(0, charIndex - 1));
+          setCharIndex(charIndex - 1);
+        }, 40);
+      } else {
+        setIsDeleting(false);
+        setLineIndex((lineIndex + 1) % heroLines.length);
+      }
+    }
+
+    return () => clearTimeout(timeout);
+  }, [charIndex, isDeleting, lineIndex, typePause]);
   const [selectedCertIndex, setSelectedCertIndex] = useState(null);
   const [previewType, setPreviewType] = useState(null);
   const [showAllProjects, setShowAllProjects] = useState(false);
@@ -361,14 +611,14 @@ export default function App() {
 
       {/* Hero Section */}
       <section id="home" className="min-h-screen flex items-center hero-section">
-        <QuantumPortrait />
+        <QuantumAnimation />
 
         {/* Right content */}
         <div className="hero-content">
           <div>
             <p className="hero-tagline text-cyan-400 mb-4 font-mono text-sm tracking-wide opacity-90">&lt; Quantum_dev.init() /&gt;</p>
             <h1 className="hero-title text-white leading-[1.1]">
-              hi, welcome to my portfolio<span className="animate-blink text-cyan-400">|</span>
+              {displayedText}<span className="animate-blink text-cyan-400">|</span>
             </h1>
           </div>
 
