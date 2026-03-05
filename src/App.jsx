@@ -2,325 +2,235 @@ import { useEffect, useRef, useState } from "react";
 
 function QuantumAnimation() {
   const canvasRef = useRef(null);
-  const mouseRef = useRef({ x: null, y: null });
+  const mouseRef = useRef({ x: 0.5, y: 0.5 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const size = 360;
+    const size = 400;
     canvas.width = size;
     canvas.height = size;
     const cx = size / 2;
     const cy = size / 2;
+    const R = 120;
 
-    const getCanvasCoords = (e) => {
+    const handleMouseMove = (e) => {
       const rect = canvas.getBoundingClientRect();
-      return {
-        x: ((e.clientX - rect.left) / rect.width) * size,
-        y: ((e.clientY - rect.top) / rect.height) * size,
+      mouseRef.current = {
+        x: (e.clientX - rect.left) / rect.width,
+        y: (e.clientY - rect.top) / rect.height,
       };
     };
-    const handleMouseMove = (e) => { mouseRef.current = getCanvasCoords(e); };
-    const handleMouseLeave = () => { mouseRef.current = { x: null, y: null }; };
+    const handleMouseLeave = () => { mouseRef.current = { x: 0.5, y: 0.5 }; };
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("mouseleave", handleMouseLeave);
 
-    // --- Quantum particles floating in the background ---
-    const particles = Array.from({ length: 60 }, () => ({
-      x: Math.random() * size,
-      y: Math.random() * size,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      r: Math.random() * 2 + 0.5,
-      phase: Math.random() * Math.PI * 2,
-      speed: Math.random() * 0.02 + 0.01,
+    // Floating particles
+    const dots = Array.from({ length: 80 }, () => ({
+      angle: Math.random() * Math.PI * 2,
+      phi: Math.random() * Math.PI,
+      r: R * (0.6 + Math.random() * 0.9),
+      speed: (Math.random() - 0.5) * 0.008,
+      phiSpeed: (Math.random() - 0.5) * 0.005,
+      size: Math.random() * 2 + 0.8,
     }));
-
-    // --- Electron orbital definitions ---
-    const orbitals = [
-      { rx: 90, ry: 35, tilt: -0.4, speed: 0.018, phase: 0, electrons: 2 },
-      { rx: 110, ry: 45, tilt: 0.9, speed: -0.014, phase: 1.2, electrons: 2 },
-      { rx: 130, ry: 30, tilt: 2.1, speed: 0.01, phase: 2.8, electrons: 1 },
-    ];
-
-    // --- Probability wave rings ---
-    const waveRings = Array.from({ length: 4 }, (_, i) => ({
-      radius: 0,
-      maxRadius: 160,
-      speed: 0.4 + i * 0.1,
-      delay: i * 80,
-      frame: -i * 80,
-    }));
-
-    // --- Energy level transitions (photon emissions) ---
-    const photons = [];
 
     let t = 0;
     let animationFrameId;
 
+    const project = (x3, y3, z3, rotY, rotX) => {
+      // Rotate around Y
+      let x = x3 * Math.cos(rotY) - z3 * Math.sin(rotY);
+      let z = x3 * Math.sin(rotY) + z3 * Math.cos(rotY);
+      let y = y3;
+      // Rotate around X
+      const y2 = y * Math.cos(rotX) - z * Math.sin(rotX);
+      const z2 = y * Math.sin(rotX) + z * Math.cos(rotX);
+      const scale = 300 / (300 + z2);
+      return { x: cx + x * scale, y: cy + y2 * scale, z: z2, scale };
+    };
+
     const render = () => {
-      t += 1;
+      t += 0.012;
       ctx.clearRect(0, 0, size, size);
 
-      const { x: mx, y: my } = mouseRef.current;
-      const mouseActive = mx != null && my != null;
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
+      const rotY = (mx - 0.5) * 1.2 + t * 0.3;
+      const rotX = (my - 0.5) * 0.8 + 0.3;
 
-      // --- Draw faint grid (quantum lattice) ---
-      ctx.strokeStyle = "rgba(34, 211, 238, 0.03)";
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < size; i += 30) {
+      // Outer glow
+      const outerGlow = ctx.createRadialGradient(cx, cy, R * 0.5, cx, cy, R * 1.8);
+      outerGlow.addColorStop(0, "rgba(34, 211, 238, 0.03)");
+      outerGlow.addColorStop(1, "rgba(34, 211, 238, 0)");
+      ctx.fillStyle = outerGlow;
+      ctx.fillRect(0, 0, size, size);
+
+      // --- Wireframe sphere ---
+      // Longitude lines
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2;
         ctx.beginPath();
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, size);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(0, i);
-        ctx.lineTo(size, i);
+        for (let j = 0; j <= 60; j++) {
+          const phi = (j / 60) * Math.PI;
+          const x3 = R * Math.sin(phi) * Math.cos(angle);
+          const y3 = R * Math.cos(phi);
+          const z3 = R * Math.sin(phi) * Math.sin(angle);
+          const p = project(x3, y3, z3, rotY, rotX);
+          if (j === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.strokeStyle = "rgba(34, 211, 238, 0.07)";
+        ctx.lineWidth = 0.8;
         ctx.stroke();
       }
 
-      // --- Background particles (quantum field) ---
-      particles.forEach((p) => {
-        p.phase += p.speed;
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0) p.x = size;
-        if (p.x > size) p.x = 0;
-        if (p.y < 0) p.y = size;
-        if (p.y > size) p.y = 0;
-
-        // Mouse repulsion
-        if (mouseActive) {
-          const dx = p.x - mx;
-          const dy = p.y - my;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 80) {
-            const force = (80 - dist) / 80 * 0.8;
-            p.x += (dx / dist) * force;
-            p.y += (dy / dist) * force;
-          }
-        }
-
-        const alpha = 0.2 + 0.3 * Math.sin(p.phase);
+      // Latitude lines
+      for (let i = 1; i < 6; i++) {
+        const phi = (i / 6) * Math.PI;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(34, 211, 238, ${alpha})`;
-        ctx.fill();
-      });
-
-      // --- Draw connecting lines between nearby particles (entanglement) ---
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 50) {
-            ctx.strokeStyle = `rgba(34, 211, 238, ${0.08 * (1 - dist / 50)})`;
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
+        for (let j = 0; j <= 60; j++) {
+          const angle = (j / 60) * Math.PI * 2;
+          const x3 = R * Math.sin(phi) * Math.cos(angle);
+          const y3 = R * Math.cos(phi);
+          const z3 = R * Math.sin(phi) * Math.sin(angle);
+          const p = project(x3, y3, z3, rotY, rotX);
+          if (j === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
         }
+        ctx.strokeStyle = "rgba(34, 211, 238, 0.06)";
+        ctx.lineWidth = 0.7;
+        ctx.stroke();
       }
 
-      // --- Probability wave rings expanding from center ---
-      waveRings.forEach((ring) => {
-        ring.frame += 1;
-        if (ring.frame < 0) return;
-        ring.radius += ring.speed;
-        if (ring.radius > ring.maxRadius) ring.radius = 0;
-
-        const alpha = 0.25 * (1 - ring.radius / ring.maxRadius);
-        ctx.strokeStyle = `rgba(34, 211, 238, ${alpha})`;
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 6]);
+      // --- Axes ---
+      const axes = [
+        { from: [0, -R * 1.3, 0], to: [0, R * 1.3, 0], label1: "|0⟩", label2: "|1⟩" },
+        { from: [-R * 1.2, 0, 0], to: [R * 1.2, 0, 0], label1: "−x", label2: "+x" },
+        { from: [0, 0, -R * 1.2], to: [0, 0, R * 1.2], label1: "−y", label2: "+y" },
+      ];
+      axes.forEach((axis, idx) => {
+        const pFrom = project(...axis.from, rotY, rotX);
+        const pTo = project(...axis.to, rotY, rotX);
         ctx.beginPath();
-        ctx.arc(cx, cy, ring.radius, 0, Math.PI * 2);
+        ctx.moveTo(pFrom.x, pFrom.y);
+        ctx.lineTo(pTo.x, pTo.y);
+        ctx.strokeStyle = idx === 0 ? "rgba(34, 211, 238, 0.25)" : "rgba(34, 211, 238, 0.1)";
+        ctx.lineWidth = idx === 0 ? 1.2 : 0.7;
+        ctx.setLineDash(idx === 0 ? [] : [3, 4]);
         ctx.stroke();
         ctx.setLineDash([]);
+
+        // Labels
+        ctx.font = "11px 'Courier New', monospace";
+        ctx.fillStyle = idx === 0 ? "rgba(34, 211, 238, 0.5)" : "rgba(34, 211, 238, 0.2)";
+        ctx.fillText(axis.label1, pFrom.x - 12, pFrom.y - 6);
+        ctx.fillText(axis.label2, pTo.x - 12, pTo.y + 14);
       });
 
-      // --- Nucleus glow ---
-      const glowPulse = 1 + 0.15 * Math.sin(t * 0.05);
-      const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, 30 * glowPulse);
-      gradient.addColorStop(0, "rgba(34, 211, 238, 0.6)");
-      gradient.addColorStop(0.3, "rgba(34, 211, 238, 0.2)");
-      gradient.addColorStop(0.6, "rgba(139, 92, 246, 0.1)");
-      gradient.addColorStop(1, "rgba(34, 211, 238, 0)");
+      // --- Quantum state vector (Bloch vector) ---
+      const theta = t * 0.7;
+      const phi = t * 0.4;
+      const stateX = R * 0.85 * Math.sin(theta) * Math.cos(phi);
+      const stateY = R * 0.85 * Math.cos(theta);
+      const stateZ = R * 0.85 * Math.sin(theta) * Math.sin(phi);
+      const pState = project(stateX, stateY, stateZ, rotY, rotX);
+      const pCenter = project(0, 0, 0, rotY, rotX);
+
+      // Vector line
       ctx.beginPath();
-      ctx.arc(cx, cy, 30 * glowPulse, 0, Math.PI * 2);
-      ctx.fillStyle = gradient;
-      ctx.fill();
-
-      // Inner nucleus
-      const nucleusGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 8);
-      nucleusGrad.addColorStop(0, "rgba(255, 255, 255, 0.9)");
-      nucleusGrad.addColorStop(0.5, "rgba(34, 211, 238, 0.7)");
-      nucleusGrad.addColorStop(1, "rgba(34, 211, 238, 0.0)");
-      ctx.beginPath();
-      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
-      ctx.fillStyle = nucleusGrad;
-      ctx.fill();
-
-      // --- Electron orbitals ---
-      orbitals.forEach((orb) => {
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(orb.tilt);
-
-        // Draw orbital path (probability cloud)
-        const segments = 120;
-        ctx.beginPath();
-        for (let i = 0; i <= segments; i++) {
-          const angle = (i / segments) * Math.PI * 2;
-          const x = Math.cos(angle) * orb.rx;
-          const y = Math.sin(angle) * orb.ry;
-          // Wave-like probability amplitude modulation
-          const wave = 1 + 0.08 * Math.sin(angle * 6 + t * 0.03);
-          if (i === 0) ctx.moveTo(x * wave, y * wave);
-          else ctx.lineTo(x * wave, y * wave);
-        }
-        ctx.strokeStyle = "rgba(34, 211, 238, 0.12)";
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Draw probability density along orbital (cloud effect)
-        for (let i = 0; i < 40; i++) {
-          const angle = (i / 40) * Math.PI * 2;
-          const x = Math.cos(angle) * orb.rx;
-          const y = Math.sin(angle) * orb.ry;
-          const prob = 0.5 + 0.5 * Math.sin(angle * 3 + t * 0.02 + orb.phase);
-          const cloudAlpha = prob * 0.06;
-          ctx.beginPath();
-          ctx.arc(x, y, 4 + prob * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(139, 92, 246, ${cloudAlpha})`;
-          ctx.fill();
-        }
-
-        // Draw electrons
-        for (let e = 0; e < orb.electrons; e++) {
-          const eAngle = t * orb.speed + orb.phase + (e * Math.PI * 2) / orb.electrons;
-          const ex = Math.cos(eAngle) * orb.rx;
-          const ey = Math.sin(eAngle) * orb.ry;
-
-          // Electron uncertainty cloud
-          const uncGrad = ctx.createRadialGradient(ex, ey, 0, ex, ey, 12);
-          uncGrad.addColorStop(0, "rgba(34, 211, 238, 0.5)");
-          uncGrad.addColorStop(0.5, "rgba(139, 92, 246, 0.15)");
-          uncGrad.addColorStop(1, "rgba(34, 211, 238, 0)");
-          ctx.beginPath();
-          ctx.arc(ex, ey, 12, 0, Math.PI * 2);
-          ctx.fillStyle = uncGrad;
-          ctx.fill();
-
-          // Electron core
-          ctx.beginPath();
-          ctx.arc(ex, ey, 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-          ctx.fill();
-
-          // Emit photon occasionally
-          if (Math.random() < 0.005) {
-            photons.push({
-              x: ex,
-              y: ey,
-              tilt: orb.tilt,
-              vx: (Math.random() - 0.5) * 2,
-              vy: (Math.random() - 0.5) * 2,
-              life: 1,
-              decay: 0.015,
-            });
-          }
-        }
-
-        ctx.restore();
-      });
-
-      // --- Photon emissions ---
-      for (let i = photons.length - 1; i >= 0; i--) {
-        const ph = photons[i];
-        ph.x += ph.vx;
-        ph.y += ph.vy;
-        ph.life -= ph.decay;
-        if (ph.life <= 0) {
-          photons.splice(i, 1);
-          continue;
-        }
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(ph.tilt);
-        const phGrad = ctx.createRadialGradient(ph.x, ph.y, 0, ph.x, ph.y, 6);
-        phGrad.addColorStop(0, `rgba(250, 204, 21, ${ph.life * 0.8})`);
-        phGrad.addColorStop(1, `rgba(250, 204, 21, 0)`);
-        ctx.beginPath();
-        ctx.arc(ph.x, ph.y, 6, 0, Math.PI * 2);
-        ctx.fillStyle = phGrad;
-        ctx.fill();
-        ctx.restore();
-      }
-
-      // --- Schrödinger wave function (bottom) ---
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(139, 92, 246, 0.3)";
-      ctx.lineWidth = 1.5;
-      for (let x = 0; x < size; x++) {
-        const y = cy + 120 + Math.sin(x * 0.04 + t * 0.03) * 15 * Math.exp(-((x - cx) ** 2) / 8000);
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
+      ctx.moveTo(pCenter.x, pCenter.y);
+      ctx.lineTo(pState.x, pState.y);
+      const vecGrad = ctx.createLinearGradient(pCenter.x, pCenter.y, pState.x, pState.y);
+      vecGrad.addColorStop(0, "rgba(139, 92, 246, 0.3)");
+      vecGrad.addColorStop(1, "rgba(34, 211, 238, 0.9)");
+      ctx.strokeStyle = vecGrad;
+      ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Second wave (superposition)
+      // Arrowhead glow
+      const stGlow = ctx.createRadialGradient(pState.x, pState.y, 0, pState.x, pState.y, 18);
+      stGlow.addColorStop(0, "rgba(34, 211, 238, 0.5)");
+      stGlow.addColorStop(0.4, "rgba(139, 92, 246, 0.15)");
+      stGlow.addColorStop(1, "rgba(34, 211, 238, 0)");
       ctx.beginPath();
-      ctx.strokeStyle = "rgba(34, 211, 238, 0.2)";
+      ctx.arc(pState.x, pState.y, 18, 0, Math.PI * 2);
+      ctx.fillStyle = stGlow;
+      ctx.fill();
+
+      // State point
+      ctx.beginPath();
+      ctx.arc(pState.x, pState.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+      ctx.fill();
+
+      // --- Second state vector (entangled pair, opposite) ---
+      const pState2 = project(-stateX, -stateY, -stateZ, rotY, rotX);
+      ctx.beginPath();
+      ctx.moveTo(pCenter.x, pCenter.y);
+      ctx.lineTo(pState2.x, pState2.y);
+      ctx.strokeStyle = "rgba(250, 204, 21, 0.3)";
       ctx.lineWidth = 1;
-      for (let x = 0; x < size; x++) {
-        const y = cy + 120 + Math.cos(x * 0.05 - t * 0.025) * 12 * Math.exp(-((x - cx) ** 2) / 10000);
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.arc(pState2.x, pState2.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(250, 204, 21, 0.6)";
+      ctx.fill();
+
+      // --- Trace path (shows recent positions of state vector) ---
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(34, 211, 238, 0.12)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 100; i++) {
+        const tt = t - i * 0.012;
+        const th = tt * 0.7;
+        const ph = tt * 0.4;
+        const tx = R * 0.85 * Math.sin(th) * Math.cos(ph);
+        const ty = R * 0.85 * Math.cos(th);
+        const tz = R * 0.85 * Math.sin(th) * Math.sin(ph);
+        const tp = project(tx, ty, tz, rotY, rotX);
+        if (i === 0) ctx.moveTo(tp.x, tp.y);
+        else ctx.lineTo(tp.x, tp.y);
       }
       ctx.stroke();
 
-      // --- Floating Dirac notation symbols ---
-      ctx.font = "12px 'Courier New', monospace";
-      ctx.fillStyle = `rgba(34, 211, 238, ${0.12 + 0.06 * Math.sin(t * 0.02)})`;
-      ctx.fillText("|ψ⟩", 20, 30 + Math.sin(t * 0.015) * 5);
-      ctx.fillText("⟨φ|", size - 45, 50 + Math.cos(t * 0.018) * 4);
-      ctx.fillText("ℏ", 35, size - 25 + Math.sin(t * 0.02 + 1) * 3);
-      ctx.fillText("Ĥ|ψ⟩ = E|ψ⟩", size / 2 - 40, 22 + Math.cos(t * 0.012) * 3);
-      ctx.fillStyle = `rgba(139, 92, 246, ${0.1 + 0.05 * Math.sin(t * 0.025)})`;
-      ctx.fillText("∫|ψ|²dx = 1", 15, size / 2 - 60 + Math.sin(t * 0.017) * 4);
-      ctx.fillText("ΔxΔp ≥ ℏ/2", size - 100, size - 20 + Math.cos(t * 0.02) * 3);
-
-      // --- Measurement collapse effect on click area ---
-      if (mouseActive) {
-        const collapseGrad = ctx.createRadialGradient(mx, my, 0, mx, my, 40);
-        collapseGrad.addColorStop(0, "rgba(250, 204, 21, 0.12)");
-        collapseGrad.addColorStop(0.5, "rgba(34, 211, 238, 0.05)");
-        collapseGrad.addColorStop(1, "rgba(34, 211, 238, 0)");
+      // --- Floating particles around sphere ---
+      dots.forEach((d) => {
+        d.angle += d.speed;
+        d.phi += d.phiSpeed;
+        const x3 = d.r * Math.sin(d.phi) * Math.cos(d.angle);
+        const y3 = d.r * Math.cos(d.phi);
+        const z3 = d.r * Math.sin(d.phi) * Math.sin(d.angle);
+        const p = project(x3, y3, z3, rotY, rotX);
+        const depthAlpha = 0.1 + 0.3 * ((p.z + R * 1.5) / (R * 3));
+        const pulse = 0.7 + 0.3 * Math.sin(t * 2 + d.angle * 3);
         ctx.beginPath();
-        ctx.arc(mx, my, 40, 0, Math.PI * 2);
-        ctx.fillStyle = collapseGrad;
+        ctx.arc(p.x, p.y, d.size * p.scale * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(34, 211, 238, ${depthAlpha * pulse})`;
         ctx.fill();
+      });
 
-        // Crosshair
-        ctx.strokeStyle = "rgba(34, 211, 238, 0.15)";
-        ctx.lineWidth = 0.5;
-        ctx.setLineDash([3, 4]);
-        ctx.beginPath();
-        ctx.moveTo(mx - 20, my);
-        ctx.lineTo(mx + 20, my);
-        ctx.moveTo(mx, my - 20);
-        ctx.lineTo(mx, my + 20);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
+      // --- Center glow ---
+      const cGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 20);
+      cGlow.addColorStop(0, "rgba(255, 255, 255, 0.15)");
+      cGlow.addColorStop(0.5, "rgba(34, 211, 238, 0.08)");
+      cGlow.addColorStop(1, "rgba(34, 211, 238, 0)");
+      ctx.beginPath();
+      ctx.arc(cx, cy, 20, 0, Math.PI * 2);
+      ctx.fillStyle = cGlow;
+      ctx.fill();
+
+      // --- Floating notation ---
+      ctx.font = "11px 'Courier New', monospace";
+      ctx.fillStyle = `rgba(34, 211, 238, ${0.15 + 0.08 * Math.sin(t * 0.8)})`;
+      ctx.fillText("|ψ⟩ = α|0⟩ + β|1⟩", 12, 24 + Math.sin(t) * 3);
+      ctx.fillStyle = `rgba(139, 92, 246, ${0.12 + 0.06 * Math.sin(t * 0.9)})`;
+      ctx.fillText("|α|² + |β|² = 1", size - 115, size - 14 + Math.cos(t * 0.7) * 2);
 
       animationFrameId = requestAnimationFrame(render);
     };
