@@ -381,6 +381,12 @@ export default function App() {
 
   const projects = [
     {
+      title: "QML - Calculating the Kernel Matrix for SVM",
+      desc: "Using a Quantum computer to calculate the Kernel Matrix that is used in SVM for classification tasks in machine learning.",
+      href: "https://github.com/Alain-Abraham-hub/QML-using-Quantum-Kernel-Matrix.git",
+      images: ["svm_support_vectors.png","quantum_results.png", "svm_accuracy.png", "pca_variance.png"]
+    },
+    {
       title: "Implementing SQD Algorithm",
       desc: "Implementing the SQD algorithm to find the ground state of a molecule.",
       href: "https://github.com/Alain-Abraham-hub/SQD-Algorithm-Groundstatefinder.git",
