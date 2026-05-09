@@ -384,8 +384,8 @@ export default function App() {
       title: "Quantum Neural networks for image classification",
       desc: "Building a QNN to classify images consisting of horizontal and vertical lines using a QPU.",
       href: "https://github.com/Alain-Abraham-hub/QML-using-QVC-and-QNN.git",
-      images: ["/Combined Circuit.png", "/Training graph.png", "/Z_FeatureMap.png", "/ansatz.png", "/results after testing.png", "/sample images plotted.png"]
-    }
+      images: ["QNN/Combined Circuit.png", "QNN/Training graph.png", "QNN/Z_FeatureMap.png", "QNN/ansatz.png", "QNN/results after testing.png", "QNN/sample images plotted.png"]
+    },
     {
       title: "QML - Calculating the Kernel Matrix for SVM",
       desc: "Using a Quantum computer to calculate the Kernel Matrix that is used in SVM for classification tasks in machine learning.",
