@@ -496,6 +496,25 @@ export default function App() {
     }
   ];
 
+  const researchPapers = [
+    {
+      title: "QNN Research Paper",
+      desc: "A research paper documenting the quantum neural network work for image classification.",
+      pdfUrl: "/QNN%20research%20paper.pdf",
+    },
+  ];
+
+  const experience = [
+    {
+      title: "Quantum Algorithms Developer Intern",
+      organization: "Artificial Brain",
+      date: "09-05-2026 - Ongoing",
+      logo: "/artificial brain logo.png",
+      link: "https://artificialbrain.us",
+      description: "",
+    },
+  ];
+
   const education = [
     {
       title: "Bachelor of Technology in Artificial Intelligence and Data Science",
@@ -524,7 +543,9 @@ export default function App() {
           <div className="hidden md:flex gap-12">
             <a href="#about" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">about</a>
             <a href="#work" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">projects</a>
+            <a href="#research-papers" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">research papers</a>
             <a href="#certifications" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">certifications</a>
+            <a href="#experience" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">experience</a>
             <a href="#education" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">education</a>
             <a href="#contact" className="text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200">contact</a>
           </div>
@@ -669,6 +690,60 @@ export default function App() {
         </div>
       </section>
 
+      {/* Research Papers Section */}
+      <section id="research-papers" className="section-container">
+        <div className="section-content-wrapper">
+          <div className="section-header">
+            <h2 className="section-title text-cyan-500">
+              <span className="text-cyan-500">/</span> research papers
+            </h2>
+            <div className="section-divider"></div>
+          </div>
+
+          <div className="work-grid">
+            {researchPapers.map((paper, idx) => (
+              <div
+                key={idx}
+                className="group flex flex-col card-project"
+              >
+                <a
+                  href={paper.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="card-image-wrap relative h-44 sm:h-48 bg-slate-900 cursor-pointer"
+                  aria-label={`Open ${paper.title}`}
+                >
+                  <img
+                    src="/QNN/sample images plotted.png"
+                    alt="Sample images plotted thumbnail"
+                    className="w-full h-full object-cover"
+                  />
+                </a>
+
+                <div className="flex flex-col flex-grow p-5 sm:p-6 space-y-3">
+                  <h3 className="text-lg font-medium text-gray-100 group-hover:text-cyan-400 transition-colors duration-200">
+                    {paper.title}
+                  </h3>
+
+                  <p className="text-gray-400 font-light text-sm leading-relaxed flex-grow line-clamp-3">
+                    {paper.desc}
+                  </p>
+
+                  <a
+                    href={paper.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-cyan-500/30 rounded-lg text-cyan-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all duration-200 text-sm font-medium mt-auto"
+                  >
+                    View PDF
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Certifications Section */}
       <section id="certifications" className="section-container">
         <div className="section-content-wrapper">
@@ -739,6 +814,58 @@ export default function App() {
         </div>
       </section>
 
+      {/* Experience Section */}
+      <section id="experience" className="section-container">
+        <div className="section-content-wrapper">
+          <div className="section-header">
+            <h2 className="section-title text-cyan-500">
+              <span className="text-cyan-500">/</span> experience
+            </h2>
+            <div className="section-divider"></div>
+          </div>
+
+          <div className="flex flex-col items-start pl-4">
+            {experience.map((item, idx) => (
+              <div key={idx} className="w-full">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8">
+                  <div className="logo-placeholder">
+                    {item.logo ? (
+                      <img src={item.logo} alt={item.organization} className="logo-image" />
+                    ) : (
+                      <div className="logo-empty">{item.organization.substring(0, 1)}</div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-cyan-400 mb-1">
+                      {item.organization}
+                    </h3>
+                    <p className="text-gray-300 font-light mb-1">
+                      {item.title}
+                    </p>
+                    <p className="text-gray-500 font-light text-sm mb-2">
+                      {item.date}
+                    </p>
+                    {item.description && (
+                      <p className="text-gray-400 font-light text-sm mb-2">
+                        {item.description}
+                      </p>
+                    )}
+                    {item.link && (
+                      <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 text-sm font-medium mt-2 inline-flex items-center gap-1 transition-colors duration-200">
+                        View Website →
+                      </a>
+                    )}
+                  </div>
+                </div>
+                {idx < experience.length - 1 && (
+                  <div className="w-px h-20 bg-gradient-to-b from-cyan-500/50 to-transparent ml-[2.5rem] mt-6 mb-2" aria-hidden />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Education Section */}
       <section id="education" className="section-container">
         <div className="section-content-wrapper">
@@ -794,7 +921,7 @@ export default function App() {
       {/* Contact Section */}
       <section id="contact" className="section-container">
         <div className="section-content-wrapper">
-          <div className="section-header">
+          <div className="section-header contact-section-header">
             <h2 className="section-title text-cyan-500">
               <span className="text-cyan-500">/</span> connect
             </h2>

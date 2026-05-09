@@ -223,6 +223,16 @@ body {
   background: linear-gradient(to right, rgba(var(--cyan-rgb), 0.4) 0%, rgba(var(--cyan-rgb), 0.05) 50%, transparent 100%);
 }
 
+.contact-section-header {
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .contact-section-header {
+    margin-bottom: 1.25rem;
+  }
+}
+
 /* About Section */
 .about-layout {
   display: grid;
