@@ -586,11 +586,16 @@ export default function App() {
           <div className="about-layout">
             <div className="about-text text-gray-400 font-light leading-relaxed">
               <p>
-                I'm an undergraduate student passionate about emerging <span className="text-cyan-400">quantum technologies</span>, with a strong interest in <span className="text-cyan-400">quantum algorithms</span> in particular.
+                I’m Alain, a <span className="text-cyan-400">Quantum Computing</span> and <span className="text-cyan-400">Quantum Machine Learning</span> (QML) enthusiast focused on <span className="text-cyan-400">hybrid quantum-classical systems</span> and <span className="text-cyan-400">quantum optimization algorithms</span> such as <span className="text-cyan-400">VQE</span> and <span className="text-cyan-400">QAOA</span>.
               </p>
-
               <p>
-                I actively pursue certifications and hands-on projects focused on <span className="text-cyan-400">quantum algorithms</span>, <span className="text-cyan-400">quantum circuits</span>, and <span className="text-cyan-400">quantum chemistry</span>, and I'm preparing to dive deeper into <span className="text-cyan-400">Quantum Machine Learning</span>. While I'm still in the early stages of my learning journey, I'm committed to building a strong theoretical foundation and practical skill set in this field.
+                Currently, I work as a <span className="text-cyan-400">Quantum Algorithm Developer</span> Intern at Artificial Brain, where I explore <span className="text-cyan-400">quantum algorithms</span>, <span className="text-cyan-400">variational architectures</span>, and <span className="text-cyan-400">near-term quantum computing</span> applications.
+              </p>
+              <p>
+                My interests include <span className="text-cyan-400">quantum information theory</span>, <span className="text-cyan-400">quantum circuits</span>, <span className="text-cyan-400">variational learning models</span>, and <span className="text-cyan-400">scalable optimization systems</span> that combine classical and <span className="text-cyan-400">quantum computation</span>.
+              </p>
+              <p>
+                I have also completed coursework and certifications through <span className="text-cyan-400">IBM Quantum</span> and <span className="text-cyan-400">NPTEL</span>, focused on <span className="text-cyan-400">quantum computing fundamentals</span> and emerging <span className="text-cyan-400">quantum technologies</span>.
               </p>
 
             </div>
