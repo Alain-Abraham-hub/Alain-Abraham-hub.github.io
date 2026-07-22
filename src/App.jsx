@@ -381,6 +381,18 @@ export default function App() {
 
   const projects = [
     {
+      title: "Route and Deliery Optimisation",
+      desc: "Solving an optimisation problem similar to TRV problem using google OR tools",
+      href: "https://github.com/Alain-Abraham-hub/Route-optimisation---Travel-Agent-Problem.git",
+      images: ["route optimisation.png", "data eda.png"]
+    },
+    {
+      title: "Factory Production Optimisation",
+      desc: "Built a factory optimisation algorithm using PuLP and CBC solver to optimise the production of a factory based on the available resources and the demand for the products.",
+      href: "https://github.com/Alain-Abraham-hub/Factory-production-optimization.git",
+      images: ["factory optimisation.png"]
+    },
+    {
       title: "Quantum Neural networks for image classification",
       desc: "Building a QNN to classify images consisting of horizontal and vertical lines using a QPU.",
       href: "https://github.com/Alain-Abraham-hub/QML-using-QVC-and-QNN.git",
