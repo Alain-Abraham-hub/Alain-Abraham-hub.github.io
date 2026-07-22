@@ -393,14 +393,14 @@ export default function App() {
       images: ["factory optimisation.png"]
     },
     {
-      title: "Quantum Neural networks for image classification",
+      title: "Quantum Neural Networks for Image Classification",
       desc: "Building a QNN to classify images consisting of horizontal and vertical lines using a QPU.",
       href: "https://github.com/Alain-Abraham-hub/QML-using-QVC-and-QNN.git",
       images: ["QNN/Combined Circuit.png", "QNN/Training graph.png", "QNN/Z_FeatureMap.png", "QNN/ansatz.png", "QNN/results after testing.png", "QNN/sample images plotted.png"]
     },
     {
       title: "QML - Calculating the Kernel Matrix for SVM",
-      desc: "Using a Quantum computer to calculate the Kernel Matrix that is used in SVM for classification tasks in machine learning.",
+      desc: "Using a quantum computer to calculate the kernel matrix used in SVM for classification tasks in machine learning.",
       href: "https://github.com/Alain-Abraham-hub/QML-using-Quantum-Kernel-Matrix.git",
       images: ["svm_support_vectors.png","quantum_results.png", "svm_accuracy.png", "pca_variance.png"]
     },
@@ -412,7 +412,7 @@ export default function App() {
     },
     {
       title: "TFIM Quantum Dynamics Simulator",
-      desc: "A program to simulate how quantum dynamics are simualted on quantum computer and to observe the average magnetization, interaction and the evloution of hamiltonian energy over time",
+      desc: "A program to simulate quantum dynamics on a quantum computer and observe the average magnetization, interaction, and evolution of Hamiltonian energy over time.",
       href: "https://github.com/Alain-Abraham-hub/TFIM-Quantum-Dynamics-Simulation.git",
       images: ["/circuit diagram.png","/tfim1.png", "/tfim2.png", "/tfim3.png"],
 
@@ -457,7 +457,7 @@ export default function App() {
       title: "Quantum gates and circuit visualizer",
       desc: "An application to visualize how gates affect the nature of qubits on a circuit",
       href: "https://github.com/Alain-Abraham-hub/Quantum-Gate-Visualiser.git",
-      images: ["/circuit visualiser 1.jpeg", "circuit visualiser 2"]
+      images: ["/circuit visualiser 1.jpeg", "/circuit visualiser 2.jpeg"]
     },
     
     
@@ -480,14 +480,14 @@ export default function App() {
     },
     {
       title: "AWS Academy Graduate - Cloud Foundations", 
-      issuer: "AWS web services",
+      issuer: "Amazon Web Services",
       date: "2025-04",
       image: "/aws cloud foundation.png",
       verifyLink: "https://www.credly.com/badges/00e33a77-7518-42da-a7f8-af208cc057bf/public_url"
     },
     {
       title: "AWS Academy Graduate - Data Engineering",
-      issuer: "AWS web services",
+      issuer: "Amazon Web Services",
       date: "2025-04",
       image: "/aws data engineering.png",
       verifyLink: "https://www.credly.com/badges/760c2ec1-d8d0-4c01-976d-0347b511468b/public_url"
@@ -530,13 +530,13 @@ export default function App() {
   const education = [
     {
       title: "Bachelor of Technology in Artificial Intelligence and Data Science",
-      school: "Karuna Institute of Technology and Sciences",
+      school: "Karunya Institute of Technology and Sciences",
       date: "Expected 2028",
       logo: "/karunya logo.png",
       link: "http://www.karunya.edu/"  
     },
     {
-      title: "Engineering and Science(STEM subjects)",
+      title: "Engineering and Science (STEM Subjects)",
       school: "SSVM Institutions",
       date: "2024",
       logo: "/ssvm logo.jpeg",
