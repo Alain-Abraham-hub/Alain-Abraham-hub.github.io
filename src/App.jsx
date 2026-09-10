@@ -381,6 +381,23 @@ export default function App() {
 
   const projects = [
     {
+      title: "Market Split Problem",
+      desc: "Solving the market split problem using Kipu's Iskay Quantum Optimizer from Qiskit functions in IBM's Quantum Computer",
+      href: "https://github.com/Alain-Abraham-hub/Market-Split-Problem.git",
+      images: [
+        "/kipu iskay linkedin post/1.png",
+        "/kipu iskay linkedin post/2.png",
+        "/kipu iskay linkedin post/3.png",
+        "/kipu iskay linkedin post/4.png",
+        "/kipu iskay linkedin post/5.png",
+        "/kipu iskay linkedin post/6.png",
+        "/kipu iskay linkedin post/7.png",
+        "/kipu iskay linkedin post/Screenshot 2026-09-10 at 3.35.21 PM.png",
+        "/kipu iskay linkedin post/Screenshot 2026-09-10 at 3.35.35 PM.png",
+        "/kipu iskay linkedin post/Screenshot 2026-09-10 at 3.35.46 PM.png"
+      ]
+    },
+    {
       title: "Route and Deliery Optimisation",
       desc: "Solving an optimisation problem similar to TRV problem using google OR tools",
       href: "https://github.com/Alain-Abraham-hub/Route-optimisation---Travel-Agent-Problem.git",
