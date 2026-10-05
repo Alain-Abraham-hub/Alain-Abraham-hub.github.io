@@ -381,6 +381,16 @@ export default function App() {
 
   const projects = [
     {
+      title: "Quantum Computational Fluid Dynamics",
+      desc: "A quantum algorithm to solve the Taylor Green Vortex problem using Navier-Stokes equations using a hybrid quantum-classical approach.",
+      href: "https://github.com/Alain-Abraham-hub/Computational-Fluid-Dynamics-TGV.git",
+      images: [
+        "/QCFD/tgv_evolution.png",
+        "/QCFD/tgv_ke_decay.png",
+        "/QCFD/tgv_visualization_full.png"
+      ]
+    },
+    {
       title: "Market Split Problem",
       desc: "Solving the market split problem using Kipu's Iskay Quantum Optimizer from Qiskit functions in IBM's Quantum Computer",
       href: "https://github.com/Alain-Abraham-hub/Market-Split-Problem.git",
